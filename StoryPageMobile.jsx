@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./StoryBook.module.css";
 import axios from "axios";
-import "../App.css";
+import "../Story_Books_Component/StoryBook.module.css";
 export default function StoryBookPageMobile({
   page,
   totalPages,

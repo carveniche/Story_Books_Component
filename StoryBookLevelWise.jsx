@@ -4,21 +4,41 @@ import styles from "./StoryBook.module.css";
 import { FlippingPages } from "flipping-pages";
 import "flipping-pages/dist/style.css";
 import { useMediaQuery } from "@mui/material";
-import { useTheme } from "@mui/styles";
+import { useTheme } from "@mui/material/styles";
+
 import StoryBookPageMobile from "./StoryPageMobile";
 
-export default function StoryBookLevelWise({ book, setViewStory }) {
-  // console.log({ book });
-  // console.log(book);
 
-  const [currPage, setCurrpage] = useState(0);
+
+export default function StoryBookLevelWise({ book, setViewStory,pageChange,currPage, isLiveClass,role_name }) {
+  
+  const getHeight = () => {
+    let output; 
+
+    if (isLiveClass) {
+      output = isMobile || isIpad ? "520px" : "490px";
+    } else {
+      output = isMobile || isIpad ? "520px" : "600px";
+    }
+
+    return output;
+  };
+
+  const getWidth = () => {
+    return isLiveClass ? "80%" : "95%";
+  };
+  const getMargin =()=>{
+    return isLiveClass ? "0px auto": "5% auto";
+  }
+
+
   const [storyData, setStoryData] = useState([]);
   const [storyDataMobile, setStoryDataMobile] = useState([]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isIpad = useMediaQuery(theme.breakpoints.down("md"));
   useEffect(() => {
-    var bookPages = JSON.parse(book.story_data);
+    var bookPages = JSON.parse(book?.story_data);
     const coverPage = [
       {
         left_cover_image: bookPages.cover_images[0].left,
@@ -42,14 +62,14 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
     console.log("totalPagesMobile", totalPagesMobile);
 
     setStoryDataMobile(totalPagesMobile);
-  }, [book.id]);
+  }, [book]);
   console.log({ storyDataMobile });
 
   return (
     <>
       {storyData.length > 0 ? (
         <>
-          <div
+          {!isLiveClass &&<div
             style={{
               fontFamily: "Reddit Sans, sans-serif",
               textAlign: "center",
@@ -77,25 +97,28 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
               Go Back / Library
             </button>
           </div>
+          }
           <div
             style={{
               display: "flex",
               justifyContent: "space-around",
               alignItems: "center",
-              height: isMobile ? "520px" : isIpad ? "520px" : "600px",
-              width: "95%",
-              margin: "5% auto",
+              height: getHeight(),
+              // height: isMobile ? "520px" : isIpad ? "520px" : "600px",
+              // width: "95%",
+              width: getWidth(),
+              // margin: "5% auto",
+              margin :getMargin(),
               position: isMobile ? "relative" : "",
               // left: isMobile ? "-50vw" : "",
               transition: "transform 0.5s",
             }}
             id="book"
           >
-            {!isMobile && (
+            {!isMobile && role_name==="tutor" && (
               <button
-                className={`card_primary_button ${
-                  currPage == 0 ? "disabled" : ""
-                }`}
+                className={`card_primary_button ${currPage == 0 ? "disabled" : ""
+                  }`}
                 style={{
                   height: "fit-content",
                   padding: "15px 10px",
@@ -103,9 +126,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                   borderRadius: "5px",
                   boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
                 }}
-                onClick={() => {
-                  setCurrpage(currPage - 1);
-                }}
+                onClick={() => pageChange(currPage - 1)}
                 disabled={currPage <= 0}
                 id="prev-btn"
               >
@@ -117,7 +138,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                 >
                   <path
                     d="M16 19l-6-6 6-6"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     fill="none"
                   />
@@ -136,35 +157,34 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
             >
               {isMobile
                 ? storyDataMobile.map((selectedbook) => {
-                    return (
-                      <StoryBookPageMobile
-                        isMobile={isMobile}
-                        isIpad={isIpad}
-                        key={`${currPage} ${storyDataMobile.length}`}
-                        totalPages={storyDataMobile.length}
-                        selectedPage={currPage + 1}
-                        page={selectedbook}
-                      />
-                    );
-                  })
+                  return (
+                    <StoryBookPageMobile
+                      isMobile={isMobile}
+                      isIpad={isIpad}
+                      key={`${currPage} ${storyDataMobile.length}`}
+                      totalPages={storyDataMobile.length}
+                      selectedPage={currPage + 1}
+                      page={selectedbook}
+                    />
+                  );
+                })
                 : storyData.map((selectedbook) => {
-                    return (
-                      <StoryBookPage
-                        isMobile={isMobile}
-                        isIpad={isIpad}
-                        key={`${currPage} ${storyData.length}`}
-                        totalPages={storyData.length}
-                        selectedPage={currPage + 1}
-                        page={selectedbook}
-                      />
-                    );
-                  })}
+                  return (
+                    <StoryBookPage
+                      isMobile={isMobile}
+                      isIpad={isIpad}
+                      key={`${currPage} ${storyData.length}`}
+                      totalPages={storyData.length}
+                      selectedPage={currPage + 1}
+                      page={selectedbook}
+                    />
+                  );
+                })}
             </FlippingPages>
-            {!isMobile && (
+            {!isMobile && role_name==="tutor" && (
               <button
-                className={`card_primary_button ${
-                  currPage >= storyData.length - 1 ? "disabled" : ""
-                }`}
+                className={`card_primary_button ${currPage >= storyData.length - 1 ? "disabled" : ""
+                  }`}
                 style={{
                   padding: "15px 10px",
                   border: "none",
@@ -174,7 +194,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                 disabled={currPage >= storyData.length - 1}
                 onClick={() => {
                   setTimeout(() => {
-                    setCurrpage(currPage + 1);
+                    pageChange(currPage + 1);
                   }, [200]);
                 }}
                 id="next-btn"
@@ -187,7 +207,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                 >
                   <path
                     d="M8 5l6 6-6 6"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     fill="none"
                   />
@@ -195,7 +215,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
               </button>
             )}
           </div>
-          {isMobile && (
+          {isMobile  && role_name==="tutor" && (
             <div
               style={{
                 display: "flex",
@@ -205,9 +225,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
               }}
             >
               <button
-                className={`card_primary_button ${
-                  currPage == 0 ? "disabled" : ""
-                }`}
+                className={`card_primary_button ${currPage == 0 ? "disabled" : ""}`}
                 style={{
                   height: "fit-content",
                   padding: "15px 10px",
@@ -215,9 +233,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                   borderRadius: "5px",
                   boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
                 }}
-                onClick={() => {
-                  setCurrpage(currPage - 1);
-                }}
+                onClick={() => pageChange(currPage - 1)}
                 disabled={currPage <= 0}
                 id="prev-btn"
               >
@@ -229,22 +245,21 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                 >
                   <path
                     d="M16 19l-6-6 6-6"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     fill="none"
                   />
                 </svg>
               </button>
               <button
-                className={`card_primary_button ${
-                  isMobile
+                className={`card_primary_button ${isMobile
                     ? currPage >= storyDataMobile.length - 1
                       ? "disabled"
                       : ""
                     : currPage >= storyData.length - 1
-                    ? "disabled"
-                    : ""
-                }`}
+                      ? "disabled"
+                      : ""
+                  }`}
                 style={{
                   padding: "15px 10px",
                   border: "none",
@@ -258,7 +273,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                 }
                 onClick={() => {
                   setTimeout(() => {
-                    setCurrpage(currPage + 1);
+                    pageChange(currPage + 1);
                   }, [200]);
                 }}
                 id="next-btn"
@@ -271,7 +286,7 @@ export default function StoryBookLevelWise({ book, setViewStory }) {
                 >
                   <path
                     d="M8 5l6 6-6 6"
-                    stroke="white"
+                    stroke="black"
                     strokeWidth="2"
                     fill="none"
                   />
