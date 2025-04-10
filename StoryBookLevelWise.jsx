@@ -10,7 +10,9 @@ import StoryBookPageMobile from "./StoryPageMobile";
 
 
 
-export default function StoryBookLevelWise({ book, setViewStory,pageChange,currPage, isLiveClass,role_name }) {
+export default function StoryBookLevelWise({ book, studentdev, setViewStory,pageChange,currPage, isLiveClass,role_name,pagechagneTabHandler,pageChangeTab}) {
+  
+  console.log(pageChangeTab,"pageChangeTabpageChangeTab")
   
   const getHeight = () => {
     let output; 
@@ -35,7 +37,10 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
   const [storyData, setStoryData] = useState([]);
   const [storyDataMobile, setStoryDataMobile] = useState([]);
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = isLiveClass
+  ? useMediaQuery(theme.breakpoints.down("md"))
+  : useMediaQuery(theme.breakpoints.down("sm"));
+
   const isIpad = useMediaQuery(theme.breakpoints.down("md"));
   useEffect(() => {
     var bookPages = JSON.parse(book?.story_data);
@@ -47,6 +52,7 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
       },
     ];
     const totalPages = [...coverPage, ...bookPages.pages];
+    console.log(totalPages,"totalPagesMobilelaptop")
     setStoryData(totalPages);
 
     var bookPagesMobile = JSON.parse(book.story_data);
@@ -64,6 +70,12 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
     setStoryDataMobile(totalPagesMobile);
   }, [book]);
   console.log({ storyDataMobile });
+
+  
+
+
+
+
 
   return (
     <>
@@ -98,6 +110,12 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
             </button>
           </div>
           }
+          {role_name==="tutor" &&
+           (<div class="flex justify-evenly p-[10px]">
+           <button class="px-4 py-2 bg-green-500 text-white rounded" onClick={()=>pagechagneTabHandler("left")}  > Left Page</button>
+           <button class="px-4 py-2 bg-blue-500 text-white rounded" onClick={()=>pagechagneTabHandler("right")} >Right  Page</button>
+         </div>)
+          }
           <div
             style={{
               display: "flex",
@@ -115,7 +133,7 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
             }}
             id="book"
           >
-            {!isMobile && role_name==="tutor" && (
+            {!isMobile && ( isLiveClass ? role_name==="tutor":true) && (
               <button
                 className={`card_primary_button ${currPage == 0 ? "disabled" : ""
                   }`}
@@ -156,11 +174,27 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
               disableSwipe={true}
             >
               {isMobile
-                ? storyDataMobile.map((selectedbook) => {
+                ? isLiveClass ?
+                storyData.map((selectedbook) => {
                   return (
                     <StoryBookPageMobile
                       isMobile={isMobile}
                       isIpad={isIpad}
+                      sidePage={pageChangeTab}
+                      isLiveClass={isLiveClass}
+                      key={`${currPage} ${storyDataMobile.length}`}
+                      totalPages={storyDataMobile.length}
+                      selectedPage={currPage + 1}
+                      page={selectedbook}
+                    />
+                  );
+                }):
+                storyDataMobile.map((selectedbook) => {
+                  return (
+                    <StoryBookPageMobile
+                      isMobile={isMobile}
+                      isIpad={isIpad}
+                      isLiveClass={isLiveClass}
                       key={`${currPage} ${storyDataMobile.length}`}
                       totalPages={storyDataMobile.length}
                       selectedPage={currPage + 1}
@@ -181,7 +215,7 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
                   );
                 })}
             </FlippingPages>
-            {!isMobile && role_name==="tutor" && (
+            {!isMobile && ( isLiveClass ? role_name==="tutor":true) && (
               <button
                 className={`card_primary_button ${currPage >= storyData.length - 1 ? "disabled" : ""
                   }`}
@@ -215,7 +249,7 @@ export default function StoryBookLevelWise({ book, setViewStory,pageChange,currP
               </button>
             )}
           </div>
-          {isMobile  && role_name==="tutor" && (
+          {isMobile  && ( isLiveClass ? role_name==="tutor":true) && (
             <div
               style={{
                 display: "flex",

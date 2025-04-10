@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./StoryBook.module.css";
 import axios from "axios";
-import "../Story_Books_Component/StoryBook.module.css";
+import "./story_books.css"
+import BaseUrl from "../../../../api/ApiConfig";
 export default function StoryBookPage({
   page,
   totalPages,
@@ -113,42 +114,41 @@ export default function StoryBookPage({
   const [wordMeaningAndUsage, setWordMeaningAndUsage] = useState("");
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
-
+  const form = new FormData();
   const getWordMeaning = async (word) => {
-    try {
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-4",
-          messages: [
-            {
-              role: "user",
-              content: `Please ge menaing, type of the word and a  example usage for the word ${word}  students to understand in json format with keys word,type,usage,meaning`,
-            },
-          ],
-          max_tokens: 512,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer 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`, // Replace with your actual API key
-          },
+    form.append(
+      'prompt_text',
+      `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
+    );
+    try{
+      const response = await axios.post(BaseUrl+'/app_teachers/gpt_response', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      );
-      const wordData = response.data.choices[0].message.content.trim();
-      setWordMeaningAndUsage(JSON.parse(wordData));
-    } catch (error) {
-      // setWordMeaningAndUsage(Unable);
-      console.error("Error while fetching Meaning:", error);
-      console.error("Error while fetching Meaning:", error);
-      console.error("Error while fetching Meaning:", error.response.data.error);
+      })
+      const res = response.data; // Axios automatically parses JSON
+      const content = res?.data?.choices?.[0]?.message?.content;
+    
+      if (content) {
+        console.log("GPT Response:", content);
+        setWordMeaningAndUsage(JSON.parse(content));
+        // Optional: parse content if it's a JSON string
+        const parsed = JSON.parse(content);
+        console.log("Word:", parsed.word);
+        console.log("Type:", parsed.type);
+        console.log("Usage:", parsed.usage);
+        console.log("Meaning:", parsed.meaning);
+      } else {
+        console.warn("No content in response.");
+      }
+    }catch(error){
+      console.error("ErrorErrorErrorError", error);
       if (error.response.data.error)
         setGptErrorMessage(
           "Unable to complete you request, Please try after some time"
         );
     }
   };
-
   var wordMeaning = {
     to: {
       word: "to",

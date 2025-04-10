@@ -1,16 +1,20 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./StoryBook.module.css";
 import axios from "axios";
-import "../Story_Books_Component/StoryBook.module.css";
+import BaseUrl from "../../../../api/ApiConfig";
+import "./story_books.css";
 export default function StoryBookPageMobile({
   page,
   totalPages,
   selectedPage,
   isMobile,
   isIpad,
+  sidePage,
+  isLiveClass
 }) {
   console.log("isMobile", isMobile);
   console.log("isIpad", isIpad);
+  console.log(sidePage, "sidePagesidePagesidePage")
 
   var orangeFlippedShadowLeft =
     "linear-gradient(270deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
@@ -111,35 +115,35 @@ export default function StoryBookPageMobile({
   const [wordMeaningAndUsage, setWordMeaningAndUsage] = useState("");
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
+  const form = new FormData();
   const getWordMeaning = async (word) => {
+    form.append(
+      'prompt_text',
+      `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
+    );
     try {
-      setGptErrorMessage("");
-      const response = await axios.post(
-        "https://api.openai.com/v1/chat/completions",
-        {
-          model: "gpt-4",
-          messages: [
-            {
-              role: "user",
-              content: `Please ge menaing, type of the word and a  example usage for the word ${word}  students to understand in json format with keys word,type,usage,meaning`,
-            },
-          ],
-          max_tokens: 512,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer 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`, // Replace with your actual API key
-          },
+      const response = await axios.post(BaseUrl + '/app_teachers/gpt_response', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      );
-      const wordData = response.data.choices[0].message.content.trim();
-      console.log({ wordData });
-      setWordMeaningAndUsage(JSON.parse(wordData));
+      })
+      const res = response.data; // Axios automatically parses JSON
+      const content = res?.data?.choices?.[0]?.message?.content;
+
+      if (content) {
+        console.log("GPT Response:", content);
+        setWordMeaningAndUsage(JSON.parse(content));
+        // Optional: parse content if it's a JSON string
+        const parsed = JSON.parse(content);
+        console.log("Word:", parsed.word);
+        console.log("Type:", parsed.type);
+        console.log("Usage:", parsed.usage);
+        console.log("Meaning:", parsed.meaning);
+      } else {
+        console.warn("No content in response.");
+      }
     } catch (error) {
-      // setWordMeaningAndUsage(Unable);
-      console.error("Error while fetching Meaning:", error);
-      console.error("Error while fetching Meaning:", error.response.data.error);
+      console.error("ErrorErrorErrorError", error);
       if (error.response.data.error)
         setGptErrorMessage(
           "Unable to complete you request, Please try after some time"
@@ -147,6 +151,7 @@ export default function StoryBookPageMobile({
     }
   };
 
+  console.log(page, "tssdfhkasdfhkasdhfkldashfdalf")
   var wordMeaning = {
     to: {
       word: "to",
@@ -254,7 +259,7 @@ export default function StoryBookPageMobile({
           scrollbarWidth: "none",
         }}
       >
-        {page.coverImage || page.image ? (
+        {!isLiveClass && ((page.coverImage || page.image) ? (
           <>
             <img
               style={{
@@ -363,7 +368,83 @@ export default function StoryBookPageMobile({
               </span>
             ))}
           </>
-        )}
+        ) )}
+
+        {isLiveClass && ((sidePage === "right")  ? (
+          (page.image || page.right_cover_image) ? (
+            <img
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+                width: "90%",
+                height: "100%", 
+              }}
+              src={page.image || page.right_cover_image}
+              alt="storyImage"
+            />
+          ) : null
+        ) :
+        ( page.left_cover_image) ? (
+          <img
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              width: "90%",
+              height: "100%", 
+            }}
+            src={ page.left_cover_image}
+            alt="storyImage"
+          />
+        ) :
+         (
+          storyWords.map((word, index) => (
+            <span
+              ref={spanRef}
+              key={`${word} ${index}`}
+              style={{
+                cursor: "pointer",
+                width: "fit-content",
+                fontFamily: "Reddit Sans, sans-serif",
+                borderRadius: "6px",
+                position: "relative",
+                backgroundColor:
+                  selectedWord === `${word} ${index}`
+                    ? "var(--Surface-Default, #FF8652)"
+                    : "transparent",
+              }}
+              onClick={(e) => {
+                setWordMeaningAndUsage("");
+                setSelectedWord(`${word} ${index}`);
+                getWordMeaning(word);
+
+                const viewportWidth = window.innerWidth;
+                const viewportHeight = window.innerHeight;
+                const clickXvw = (e.clientX / viewportWidth) * 100;
+                const clickYvh = (e.clientY / viewportHeight) * 100;
+
+                const currEle = e.target;
+                const parentRect = currEle.parentElement.getBoundingClientRect();
+                const offset = getOffsetRelativeToContainer(currEle, currEle.parentElement);
+                const relativeX = e.clientX - parentRect.left;
+                const relativeY = e.clientY - parentRect.top;
+
+                if (spanRef.current) {
+                  const adjust = isMobile ? 50 : 115;
+
+                  setPopupPosition({
+                    top: relativeY,
+                    left: offset.left - 40,
+                  });
+
+                  setShowPopup(true);
+                }
+              }}
+            >
+              {` ${word} `}
+              {selectedWord === `${word} ${index}` ? gptRepsonseWordMeaning() : ""}
+            </span>
+          ))
+        ))}
       </div>
     </div>
   );
