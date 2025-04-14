@@ -113,7 +113,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
           {(role_name === "tutor" && checkFirstDevice) &&
             (<div class="flex justify-evenly p-[10px]">
               <button
-                className={`px-4 py-2 rounded text-white ${activeSide === "left" ? "bg-gray-400 cursor-not-allowed" : "bg-green-500"
+                className={`px-4 py-2 rounded text-white ${activeSide === "left" ? "bg-gray-400 cursor-not-allowed" : "bg-blue-500"
                   }`}
                 onClick={() => pagechagneTabHandler("left", currPage - 1)}
                 disabled={activeSide === "left"}
@@ -151,7 +151,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
             {!isMobile && (isLiveClass ? role_name === "tutor" : true) && (
               <button
                 className={`card_primary_button ${currPage == 0 ? "disabled" : ""
-                  }`}
+                  } ${(isLiveClass && checkFirstDevice && (activeSide !== "left"))|| currPage == 0  ? "cursor-not-allowed":""} `}
                 style={{
                   height: "fit-content",
                   padding: "15px 10px",
@@ -160,7 +160,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
                   boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
                 }}
                 onClick={() => pageChange(currPage - 1)}
-                disabled={currPage <= 0}
+                disabled={currPage <= 0  || (isLiveClass && checkFirstDevice && (activeSide !== "left"))}
                 id="prev-btn"
               >
                 <svg
@@ -216,15 +216,17 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
             </FlippingPages>
             {!isMobile && (isLiveClass ? role_name === "tutor" : true) && (
               <button
-                className={`card_primary_button ${currPage >= storyData.length - 1 ? "disabled" : ""
-                  }`}
+              className={`card_primary_button ${
+                currPage >= storyData.length - 1  ? "disable" : ""
+              } ${(isLiveClass && checkFirstDevice && (activeSide !== "right")) || currPage >= storyData.length - 1  ? "cursor-not-allowed":""} `}
+              
                 style={{
                   padding: "15px 10px",
                   border: "none",
                   borderRadius: "5px",
                   boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
                 }}
-                disabled={currPage >= storyData.length - 1}
+                disabled={currPage >= storyData.length - 1 || (isLiveClass && checkFirstDevice && (activeSide !== "right"))}
                 onClick={() => {
                   setTimeout(() => {
                     pageChange(currPage + 1);
