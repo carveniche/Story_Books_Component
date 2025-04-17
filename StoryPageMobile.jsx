@@ -371,22 +371,30 @@ export default function StoryBookPageMobile({
             {question && answer && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ marginBottom: '1rem', borderRadius: "6px",
+                    padding: "5px",
                      fontFamily: "Reddit Sans, sans-serif",  
                      backgroundColor: "rgb(255, 246, 230)"}}>
                     {question}
                   </div>
-                  {answer.map((option, index) => (
-                    <div key={index} 
+
+                  <div
                     style={{ 
                       paddingBottom: '0.5rem',
                       borderRadius: "6px",
                       fontFamily: "Reddit Sans, sans-serif",
                       paddingRight: '0.5rem',
+                      padding: "5px",
                       backgroundColor: 'rgb(229, 247, 222)',
-                      }}>
+                      }}
+                  >
+                  {answer.map((option, index) => (
+                    <div key={index} 
+                    >
                     {option}
                   </div>
                 ))}
+                  </div>
+                  
               </div>
             )}    
 

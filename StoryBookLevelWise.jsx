@@ -124,7 +124,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
                 disabled={activeSide === "left"}
               >
                 Left Page
-                {activeSide === "left" && <span> ✅</span>}
+                {activeSide === "left" && <span> 📖</span>}
               </button>
 
               <button
@@ -134,7 +134,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
                 disabled={activeSide === "right"}
               >
                 Right Page
-                {activeSide === "right" && <span> ✅</span>}
+                {activeSide === "right" && <span> 📖</span>}
               </button>
             </div>)
           }
