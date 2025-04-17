@@ -139,6 +139,7 @@ export default function StoryBookPage({
         console.log("Usage:", parsed.usage);
         console.log("Meaning:", parsed.meaning);
       } else {
+        setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
       }
     }catch(error){
@@ -210,7 +211,7 @@ export default function StoryBookPage({
             : "",
           width: isMobile ? "" : "60%",
           textWrap: "wrap",
-          padding: isMobile ? "" : "7% 5%",
+          padding: isMobile ? "" : "5% 4%",
           marginTop: isMobile ? "5%" : "0",
           height: isMobile ? "50%" : "100%",
           scrollbarWidth: "none",

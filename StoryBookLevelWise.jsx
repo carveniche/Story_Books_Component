@@ -124,6 +124,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
                 disabled={activeSide === "left"}
               >
                 Left Page
+                {activeSide === "left" && <span> ✅</span>}
               </button>
 
               <button
@@ -133,6 +134,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
                 disabled={activeSide === "right"}
               >
                 Right Page
+                {activeSide === "right" && <span> ✅</span>}
               </button>
             </div>)
           }
@@ -156,13 +158,14 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
             {!isMobile && (isLiveClass ? role_name === "tutor" : true) && (
               <button
                 className={`card_primary_button ${currPage == 0 ? "disabled" : ""
-                  } ${(isLiveClass && checkFirstDevice && (activeSide !== "left"))|| currPage == 0  ? "cursor-not-allowed":""} `}
+                  } ${(isLiveClass && checkFirstDevice && (activeSide !== "left"))|| currPage == 0  ? "cursor-not-allowed opacity-50":""} `}
                 style={{
                   height: "fit-content",
                   padding: "15px 10px",
                   border: "none",
                   borderRadius: "5px",
                   boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                  backgroundColor:"#FF8652",
                 }}
                 onClick={() => pageChange(currPage - 1)}
                 disabled={currPage <= 0  || (isLiveClass && checkFirstDevice && (activeSide !== "left"))}
@@ -223,13 +226,14 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
               <button
               className={`card_primary_button ${
                 currPage >= storyData.length - 1  ? "disable" : ""
-              } ${(isLiveClass && checkFirstDevice && (activeSide !== "right")) || currPage >= storyData.length - 1  ? "cursor-not-allowed":""} `}
+              } ${(isLiveClass && checkFirstDevice && (activeSide !== "right")) || currPage >= storyData.length - 1  ? "cursor-not-allowed opacity-50":""} `}
               
                 style={{
                   padding: "15px 10px",
                   border: "none",
                   borderRadius: "5px",
                   boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+                  backgroundColor:"#FF8652",
                 }}
                 disabled={currPage >= storyData.length - 1 || (isLiveClass && checkFirstDevice && (activeSide !== "right"))}
                 onClick={() => {

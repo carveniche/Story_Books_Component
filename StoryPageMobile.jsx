@@ -138,6 +138,7 @@ export default function StoryBookPageMobile({
         console.log("Usage:", parsed.usage);
         console.log("Meaning:", parsed.meaning);
       } else {
+        setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
       }
     }catch(error){
@@ -262,7 +263,7 @@ export default function StoryBookPageMobile({
               style={{
                 maxWidth: "100%",
                 // maxHeight: "100%",
-                height: "400px",
+                height: "350px",
                 width: "90%",
               }}
               src={page.coverImage || page.image}
@@ -369,13 +370,16 @@ export default function StoryBookPageMobile({
 
             {question && answer && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ marginBottom: '1rem', fontFamily: "Reddit Sans, sans-serif",  backgroundColor: "rgb(255, 246, 230)"}}>
+                  <div style={{ marginBottom: '1rem', borderRadius: "6px",
+                     fontFamily: "Reddit Sans, sans-serif",  
+                     backgroundColor: "rgb(255, 246, 230)"}}>
                     {question}
                   </div>
                   {answer.map((option, index) => (
                     <div key={index} 
                     style={{ 
                       paddingBottom: '0.5rem',
+                      borderRadius: "6px",
                       fontFamily: "Reddit Sans, sans-serif",
                       paddingRight: '0.5rem',
                       backgroundColor: 'rgb(229, 247, 222)',
@@ -659,7 +663,7 @@ export default function StoryBookPageMobile({
       style={{
         // width: !isMobile && isIpad ? "85%" : isMobile ? "98%" : "100%",
         width: isMobile ? "98%" : isIpad ? "90%" : "100%",
-        height: "95%",
+        height: "90%",
         margin: "auto",
         backfaceVisibility: "none",
       }}
