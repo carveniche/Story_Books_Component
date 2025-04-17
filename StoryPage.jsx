@@ -208,7 +208,7 @@ export default function StoryBookPage({
           borderBottom: isMobile
             ? "1px solid var(--Surface-Default, #FF8652)"
             : "",
-          width: isMobile ? "" : "50%",
+          width: isMobile ? "" : "60%",
           textWrap: "wrap",
           padding: isMobile ? "" : "7% 5%",
           marginTop: isMobile ? "5%" : "0",
@@ -234,7 +234,7 @@ export default function StoryBookPage({
             backgroundColor: page.iscoverImage ? "white" : "wheat",
             padding: page.iscoverImage ? "0" : "10px",
             margin: "auto",
-            width: isMobile ? "90%" : "90%",
+            width: isMobile ? "90%" : "100%",
             border: page.iscoverImage
               ? "0"
               : "1px solid var(--Surface-Default, #FF8652)",
@@ -265,7 +265,7 @@ export default function StoryBookPage({
             </>
           ) : (
             <>
-              {storyWords.map((word, index) => (
+              {storyWords && storyWords.map((word, index) => (
                 <>
                   <span
                     ref={spanRef}
@@ -282,6 +282,7 @@ export default function StoryBookPage({
                           : "transparent",
                     }}
                     onClick={(e) => {
+                      if (showPopup) return;
                       setWordMeaningAndUsage("");
                       setSelectedWord(`${word} ${index}`);
                       getWordMeaning(word);
@@ -367,6 +368,40 @@ export default function StoryBookPage({
                   </span>
                 </>
               ))}
+
+              {question && <div
+              style={{
+                width: "fit-content",
+                fontFamily: "Reddit Sans, sans-serif",
+                borderRadius: "6px",
+                backgroundColor: "rgb(255, 246, 230)",
+                paddingLeft: "5px",
+                marginBottom:"10px"
+                }
+              }
+              >
+                { question.map((word,index)=>(
+                <span >
+                  {word}</span>
+              ))}</div>}
+              {answer && 
+                 <div 
+                 style={{
+                   
+                   fontFamily: "Reddit Sans, sans-serif",
+                   paddingLeft: "5px",
+                   backgroundColor: 'rgb(229, 247, 222)', 
+                   }
+                 }
+                 >
+                    {
+                      answer.map((word,index)=>(
+                      <div >{word}</div>
+                    ))
+                    }
+                 </div>
+              }
+              
             </>
           )}
         </div>
@@ -377,7 +412,7 @@ export default function StoryBookPage({
     <div
       className="rightPage"
       style={{
-        width: isMobile ? "100%" : "50%",
+        width: isMobile ? "100%" : "60%",
         height: isMobile ? "50%" : "100%",
         overflow: "hidden",
         borderLeft: isMobile ? "" : "1px solid var(--Surface-Default, #FF8652)",
@@ -408,7 +443,9 @@ export default function StoryBookPage({
     return new Promise((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(speech);
       console.log({ voices });
-      utterance.voice = voices[12];
+      utterance.rate = 0.9;
+      const selectedVoice = voices.find((v) => v.lang === "en-US"); 
+      utterance.voice = selectedVoice || voices[0];
       utterance.onend = () => resolve();
       utterance.onerror = (event) => console.log("ERROR", event.error);
       speechSynthesis.speak(utterance);
@@ -442,12 +479,26 @@ export default function StoryBookPage({
     };
   }, []);
   const popupRef = useRef(null);
+  const [question,setQuestion]=useState([])
+  const [answer,setanswer]=useState()
   useEffect(() => {
     if (page.description) {
       setStoryWords(page.description.split(" "));
       stopSpeaking();
+      setQuestion([])
+      setanswer("")
     }
-  }, [page.pageNo, page.description]);
+    if(page.question){
+      setStoryWords([])
+      setQuestion(page.question.split(""))
+      console.log(page.question,"question")
+    }
+    if(page.answers){
+      setanswer(page.answers.split("\n"))
+      console.log(page.answers.split("\n"),"answer")
+    }
+
+  }, [page.pageNo, page.description,page.question,page.answers]);
 
   // wordMeaningAndUsage.word
   //                       .split("")

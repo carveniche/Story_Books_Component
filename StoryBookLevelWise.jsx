@@ -12,7 +12,7 @@ import StoryBookPageMobile from "./StoryPageMobile";
 
 export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice, setViewStory, pageChange, currPage, isLiveClass, role_name, pagechagneTabHandler, pageChangeTab }) {
 
-  console.log(pageChangeTab, "pageChangeTabpageChangeTab")
+  console.log(checkFirstDevice, "pageChangeTabpageChangeTab")
 
   const getHeight = () => {
     let output;
@@ -38,7 +38,7 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
   const [storyDataMobile, setStoryDataMobile] = useState([]);
   const theme = useTheme();
   const isMobile = isLiveClass
-    ? useMediaQuery(theme.breakpoints.down("md"))
+    ? useMediaQuery(theme.breakpoints.down("lg"))
     : useMediaQuery(theme.breakpoints.down("sm"));
 
   const isIpad = useMediaQuery(theme.breakpoints.down("md"));
@@ -62,7 +62,12 @@ export default function StoryBookLevelWise({ book, activeSide, checkFirstDevice,
       totalPagesMobile.push({ coverImage: bk.left ? bk.left : bk.right });
     });
     bookPagesMobile.pages.forEach((bk) => {
-      totalPagesMobile.push({ description: bk.description });
+     
+      if(bk.description.length>1){
+        totalPagesMobile.push({ description: bk.description });
+      }else if(bk.question){
+        totalPagesMobile.push({ question: bk.question, answer:bk.answers });
+      }
       totalPagesMobile.push({ image: bk.image });
     });
     console.log("totalPagesMobile", totalPagesMobile);

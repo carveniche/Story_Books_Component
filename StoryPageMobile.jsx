@@ -112,11 +112,13 @@ export default function StoryBookPageMobile({
   const [wordMeaningAndUsage, setWordMeaningAndUsage] = useState("");
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
+  const form = new FormData();
   const getWordMeaning = async (word) => {
     form.append(
       'prompt_text',
       `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
     );
+
     try{
       const response = await axios.post(BaseUrl+'/app_teachers/gpt_response', form, {
         headers: {
@@ -269,7 +271,7 @@ export default function StoryBookPageMobile({
           </>
         ) : (
           <>
-            {storyWords.map((word, index) => (
+            {storyWords.length>1 && storyWords.map((word, index) => (
               <span
                 ref={spanRef}
                 key={`${word} ${index}`}
@@ -285,6 +287,7 @@ export default function StoryBookPageMobile({
                       : "transparent",
                 }}
                 onClick={(e) => {
+                  if (showPopup) return;
                   setWordMeaningAndUsage("");
                   setSelectedWord(`${word} ${index}`);
                   getWordMeaning(word);
@@ -363,6 +366,27 @@ export default function StoryBookPageMobile({
                   : ""}
               </span>
             ))}
+
+            {question && answer && (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ marginBottom: '1rem', fontFamily: "Reddit Sans, sans-serif",  backgroundColor: "rgb(255, 246, 230)"}}>
+                    {question}
+                  </div>
+                  {answer.map((option, index) => (
+                    <div key={index} 
+                    style={{ 
+                      paddingBottom: '0.5rem',
+                      fontFamily: "Reddit Sans, sans-serif",
+                      paddingRight: '0.5rem',
+                      backgroundColor: 'rgb(229, 247, 222)',
+                      }}>
+                    {option}
+                  </div>
+                ))}
+              </div>
+            )}    
+
+
           </>
         )}
       </div>
@@ -372,7 +396,9 @@ export default function StoryBookPageMobile({
     return new Promise((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(speech);
       console.log({ voices });
-      utterance.voice = voices[12];
+      utterance.rate = 0.9;
+      const selectedVoice = voices.find((v) => v.lang === "en-US"); 
+      utterance.voice = selectedVoice || voices[0];
       utterance.onend = () => resolve();
       utterance.onerror = (event) => console.log("ERROR", event.error);
       speechSynthesis.speak(utterance);
@@ -610,15 +636,23 @@ export default function StoryBookPageMobile({
     };
   }, []);
   const popupRef = useRef(null);
+  const [question,setquestion]=useState("")
+  const [answer,setAnswer]=useState([])
   useEffect(() => {
     if (page.description) {
+      setquestion("")
       setStoryWords(page.description.split(" "));
       stopSpeaking();
+    }else if(page.question){
+      setStoryWords([])
+      setquestion(page.question);
+      setAnswer(page.answer.split("\n"))
+      console.log(page.question,"split")
     } else {
       setStoryWords([]);
       stopSpeaking();
     }
-  }, [page.pageNo, page.description]);
+  }, [page.pageNo, page.description,page.question]);
 
   return (
     <div
