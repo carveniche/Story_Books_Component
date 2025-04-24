@@ -10,8 +10,8 @@ export default function StoryBookPageMobile({
   isMobile,
   isIpad,
 }) {
-  console.log("isMobile", isMobile);
-  console.log("isIpad", isIpad);
+  // console.log("isMobile", isMobile);
+  // console.log("isIpad", isIpad);
 
   var orangeFlippedShadowLeft =
     "linear-gradient(270deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
@@ -129,14 +129,14 @@ export default function StoryBookPageMobile({
       const content = res?.data?.choices?.[0]?.message?.content;
     
       if (content) {
-        console.log("GPT Response:", content);
+        // console.log("GPT Response:", content);
         setWordMeaningAndUsage(JSON.parse(content));
         // Optional: parse content if it's a JSON string
         const parsed = JSON.parse(content);
-        console.log("Word:", parsed.word);
-        console.log("Type:", parsed.type);
-        console.log("Usage:", parsed.usage);
-        console.log("Meaning:", parsed.meaning);
+        // console.log("Word:", parsed.word);
+        // console.log("Type:", parsed.type);
+        // console.log("Usage:", parsed.usage);
+        // console.log("Meaning:", parsed.meaning);
       } else {
         setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
@@ -303,44 +303,44 @@ export default function StoryBookPageMobile({
                   const clickXvw = (clickXX / viewportWidth) * 100;
                   const clickYvh = (clickYY / viewportHeight) * 100;
 
-                  console.log(
-                    `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${
-                      clickYvh.toFixed(2) - 14
-                    }vh`
-                  );
-                  console.log(e.target);
-                  console.log(e.clientX);
+                  // console.log(
+                  //   `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${
+                  //     clickYvh.toFixed(2) - 14
+                  //   }vh`
+                  // );
+                  // console.log(e.target);
+                  // console.log(e.clientX);
                   const currEle = e.target;
                   const asdad = currEle.getBoundingClientRect();
-                  console.log(asdad.left, ":::::", asdad.top);
-                  console.log(e.clientX);
-                  console.log(e.clientY);
+                  // console.log(asdad.left, ":::::", asdad.top);
+                  // console.log(e.clientX);
+                  // console.log(e.clientY);
                   const clickX = e.clientX;
                   const clickY = e.clientY;
                   const parentDiv = e.target.parentElement;
                   const parentRect = parentDiv.getBoundingClientRect();
-                  console.log(parentRect.left, " parentRect ", parentRect.top);
+                  // console.log(parentRect.left, " parentRect ", parentRect.top);
                   let element = e.target; // Target element
                   let container = e.target.parentElement;
-                  console.log({ element, container });
+                  // console.log({ element, container });
                   let offset = getOffsetRelativeToContainer(element, container);
-                  console.log(offset);
-                  console.log(
-                    "Distance from container top: " + (offset.top - 40)
-                  );
-                  console.log(
-                    "Distance from container left: " + (offset.left - 40)
-                  );
+                  // console.log(offset);
+                  // console.log(
+                  //   "Distance from container top: " + (offset.top - 40)
+                  // );
+                  // console.log(
+                  //   "Distance from container left: " + (offset.left - 40)
+                  // );
 
                   const relativeX = clickX - parentRect.left;
                   const relativeY = clickY - parentRect.top;
-                  console.log(relativeX, "-----------------", relativeY);
+                  // console.log(relativeX, "-----------------", relativeY);
                   var viewwidth = clickXvw.toFixed(2) - 25;
                   var viewheight = clickYvh.toFixed(2) - 14;
-                  console.log("window.innerWidth", window.innerWidth);
+                  // console.log("window.innerWidth", window.innerWidth);
                   if (spanRef.current) {
                     var adjust = isMobile ? 50 : 115;
-                    console.log({ adjust });
+                    // console.log({ adjust });
                     // top: relativeY + (isMobile ? 50 : 115),
                     // left: relativeX + (isMobile ? 0 : 135),
                     setPopupPosition({
@@ -407,12 +407,12 @@ export default function StoryBookPageMobile({
   function speak(speech) {
     return new Promise((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(speech);
-      console.log({ voices });
+      // console.log({ voices });
       utterance.rate = 0.9;
       const selectedVoice = voices.find((v) => v.lang === "en-US"); 
       utterance.voice = selectedVoice || voices[0];
       utterance.onend = () => resolve();
-      utterance.onerror = (event) => console.log("ERROR", event.error);
+      // utterance.onerror = (event) => console.log("ERROR", event.error);
       speechSynthesis.speak(utterance);
     });
   }
@@ -536,9 +536,9 @@ export default function StoryBookPageMobile({
                       setIsSpeaking(true);
                       try {
                         await speak(wordMeaningAndUsage.word);
-                        console.log("Speech completed successfully.");
+                        // console.log("Speech completed successfully.");
                       } catch (error) {
-                        console.error("Error during speaking:", error);
+                        // console.error("Error during speaking:", error);
                       } finally {
                         setIsSpeaking(false);
                       }
@@ -659,7 +659,7 @@ export default function StoryBookPageMobile({
       setStoryWords([])
       setquestion(page.question);
       setAnswer(page.answer.split("\n"))
-      console.log(page.question,"split")
+      // console.log(page.question,"split")
     } else {
       setStoryWords([]);
       stopSpeaking();
@@ -808,9 +808,9 @@ export default function StoryBookPageMobile({
                       setIsSpeaking(true);
                       try {
                         await speak(wordMeaningAndUsage.word);
-                        console.log("Speech completed successfully.");
+                        // console.log("Speech completed successfully.");
                       } catch (error) {
-                        console.error("Error during speaking:", error);
+                        // console.error("Error during speaking:", error);
                       } finally {
                         setIsSpeaking(false);
                       }

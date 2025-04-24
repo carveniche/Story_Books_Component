@@ -3,6 +3,7 @@ import styles from "./StoryBook.module.css";
 import axios from "axios";
 import "./story_books.css"
 import BaseUrl from "../../../../api/ApiConfig";
+// import BaseUrl from "./api/ApiConfig";
 export default function StoryBookPage({
   page,
   totalPages,
@@ -10,8 +11,8 @@ export default function StoryBookPage({
   isMobile,
   isIpad,
 }) {
-  console.log("isMobile", isMobile);
-  console.log("isIpad", isIpad);
+  // console.log("isMobile", isMobile);
+  // console.log("isIpad", isIpad);
   // console.log({ page, totalPages, selectedPage });
   // console.log(page);
 
@@ -130,14 +131,14 @@ export default function StoryBookPage({
       const content = res?.data?.choices?.[0]?.message?.content;
     
       if (content) {
-        console.log("GPT Response:", content);
+        // console.log("GPT Response:", content);
         setWordMeaningAndUsage(JSON.parse(content));
         // Optional: parse content if it's a JSON string
         const parsed = JSON.parse(content);
-        console.log("Word:", parsed.word);
-        console.log("Type:", parsed.type);
-        console.log("Usage:", parsed.usage);
-        console.log("Meaning:", parsed.meaning);
+        // console.log("Word:", parsed.word);
+        // console.log("Type:", parsed.type);
+        // console.log("Usage:", parsed.usage);
+        // console.log("Meaning:", parsed.meaning);
       } else {
         setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
@@ -189,7 +190,7 @@ export default function StoryBookPage({
     let offsetLeft = 0;
 
     while (element && element !== container) {
-      console.log({ element, container });
+      // console.log({ element, container });
       offsetTop += element.offsetTop;
       offsetLeft += element.offsetLeft;
       element = element.offsetParent;
@@ -198,235 +199,30 @@ export default function StoryBookPage({
     return { top: offsetTop, left: offsetLeft };
   }
 
-  const LeftPage = () => {
-    return (
-      <div
-        className="leftPage"
-        style={{
-          borderRight: isMobile
-            ? ""
-            : "1px solid var(--Surface-Default, #FF8652)",
-          borderBottom: isMobile
-            ? "1px solid var(--Surface-Default, #FF8652)"
-            : "",
-          width: isMobile ? "" : "60%",
-          textWrap: "wrap",
-          padding: isMobile ? "" : "5% 4%",
-          marginTop: isMobile ? "5%" : "0",
-          height: isMobile ? "50%" : "100%",
-          scrollbarWidth: "none",
-          backgroundColor: "var(--Surface-Default, #FF8652)",
-          boxSizing: "border-box",
-          transformStyle: "preserve-3d",
-          transition: "transform 5s",
-          transformOrigin: "left",
-          // overflow: "auto",
-          overflowY: "visible",
-          background:
-            selectedPage == 1
-              ? ""
-              : isMobile
-              ? orangeFlippedShadowBottom
-              : orangeFlippedShadowLeft,
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: page.iscoverImage ? "white" : "wheat",
-            padding: page.iscoverImage ? "0" : "10px",
-            margin: "auto",
-            width: isMobile ? "90%" : "100%",
-            border: page.iscoverImage
-              ? "0"
-              : "1px solid var(--Surface-Default, #FF8652)",
-            borderRadius: "10px",
-            display: page.iscoverImage ? "flex" : "block",
-            justifyContent: page.iscoverImage ? "center" : "center",
-            alignItems: page.iscoverImage ? "center" : "center",
-            height: page.iscoverImage ? "90%" : "",
-            fontSize: page.iscoverImage ? "30px" : "20px",
-            height: isMobile ? "80%" : "100%",
-            // overflow: "scroll",
-            overflowY: "visible",
-            scrollbarWidth: "none",
-          }}
-        >
-          {page.iscoverImage ? (
-            <>
-              <img
-                style={{
-                  maxWidth: "100%",
-                  maxHeight: "100%",
-                  width: "90%",
-                  height: "-webkit-fill-available",
-                }}
-                src={page.left_cover_image}
-                alt={"storyImage"}
-              />
-            </>
-          ) : (
-            <>
-              {storyWords && storyWords.map((word, index) => (
-                <>
-                  <span
-                    ref={spanRef}
-                    key={`${word} ${index}`}
-                    style={{
-                      cursor: "pointer",
-                      width: "fit-content",
-                      fontFamily: "Reddit Sans, sans-serif",
-                      borderRadius: "6px",
-                      position: "relative",
-                      backgroundColor:
-                        selectedWord == `${word} ${index}`
-                          ? "var(--Surface-Default, #FF8652)"
-                          : "transparent",
-                    }}
-                    onClick={(e) => {
-                      if (showPopup) return;
-                      setWordMeaningAndUsage("");
-                      setSelectedWord(`${word} ${index}`);
-                      getWordMeaning(word);
-                      const viewportWidth = window.innerWidth;
-                      const viewportHeight = window.innerHeight;
-
-                      // Get click position relative to the viewport
-                      const clickXX = e.clientX;
-                      const clickYY = e.clientY;
-
-                      // Convert to vw and vh
-                      const clickXvw = (clickXX / viewportWidth) * 100;
-                      const clickYvh = (clickYY / viewportHeight) * 100;
-
-                      console.log(
-                        `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${
-                          clickYvh.toFixed(2) - 14
-                        }vh`
-                      );
-                      var viewwidth = clickXvw.toFixed(2) - 5;
-                      var viewheight = clickYvh.toFixed(2) - 14;
-                      console.log(e.target);
-                      console.log(e.clientX);
-                      const currEle = e.target;
-                      const asdad = currEle.getBoundingClientRect();
-                      console.log(asdad.left, ":::::", asdad.top);
-                      console.log(e.clientX);
-                      console.log(e.clientY);
-                      const clickX = e.clientX;
-                      const clickY = e.clientY;
-                      const parentDiv = e.target.parentElement;
-                      const parentRect = parentDiv.getBoundingClientRect();
-                      console.log(
-                        parentRect.left,
-                        " parentRect ",
-                        parentRect.top
-                      );
-
-                      let element = document.querySelector("#root"); // Target element
-                      let container = e.target;
-                      console.log({ element, container });
-                      let offset = getOffsetRelativeToContainer(
-                        element,
-                        container
-                      );
-                      console.log(offset);
-                      console.log(
-                        "Distance from container top: " + (offset.top - 40)
-                      );
-                      console.log(
-                        "Distance from container left: " + (offset.left - 40)
-                      );
-
-                      const relativeX = clickX - parentRect.left;
-                      const relativeY = clickY - parentRect.top;
-                      console.log("window.innerWidth", window.innerWidth);
-
-                      console.log(relativeX, "-----------------", relativeY);
-                      if (spanRef.current) {
-                        var adjust = isMobile ? 50 : 115;
-                        console.log({ adjust });
-                        // top: relativeY + (isMobile ? 50 : 115),
-                        // left: relativeX + (isMobile ? 0 : 135),
-                        setPopupPosition({
-                          // top: offset.top - (isMobile ? 80 : isIpad ? 110 : 110),
-                          // left: offset.left - 60,
-                          top:
-                            offset.top -
-                            (isMobile ? 80 : isIpad ? 110 : 110) -
-                            (isMobile ? 60 : 60),
-                          left: offset.left - 60 - 300,
-                          // top: `${viewheight}vh`,
-                          // left: `${viewwidth}vw`,
-                        });
-                        setShowPopup(true);
-                      }
-                    }}
-                  >
-                    {` ${word}  `}{" "}
-                    {selectedWord == `${word} ${index}`
-                      ? gptRepsonseWordMeaning()
-                      : ""}
-                  </span>
-                </>
-              ))}
-
-              {question && <div
-              style={{
-                width: "fit-content",
-                fontFamily: "Reddit Sans, sans-serif",
-                borderRadius: "6px",
-                backgroundColor: "rgb(255, 246, 230)",
-                paddingLeft: "5px",
-                marginBottom:"10px"
-                }
-              }
-              >
-                { question.map((word,index)=>(
-                <span >
-                  {word}</span>
-              ))}</div>}
-              {answer && 
-                 <div 
-                 style={{
-                   
-                   fontFamily: "Reddit Sans, sans-serif",
-                   paddingLeft: "5px",
-                   backgroundColor: 'rgb(229, 247, 222)', 
-                   }
-                 }
-                 >
-                    {
-                      answer.map((word,index)=>(
-                      <div >{word}</div>
-                    ))
-                    }
-                 </div>
-              }
-              
-            </>
-          )}
-        </div>
-      </div>
-    );
-  };
+  
   const RightPage = () => (
     <div
       className="rightPage"
       style={{
-        width: isMobile ? "100%" : "60%",
-        height: isMobile ? "50%" : "100%",
-        overflow: "hidden",
-        borderLeft: isMobile ? "" : "1px solid var(--Surface-Default, #FF8652)",
-        borderTop: isMobile ? "1px solid var(--Surface-Default, #FF8652)" : "",
-        background:
-          selectedPage == totalPages
-            ? ""
-            : isMobile
-            ? orangeFlippedShadowTop
-            : orangeFlippedShadowRight,
+        width: "100%",
+        height: "100%",
+        overflow: "visible",
+        // position: "relative",
+        display: "flex",
+        alignItems: page.description ? "flex-start" : "center",
+        justifyContent: "center",
+        background: "white",
+        // borderLeft: isMobile ? "" : "1px solid var(--Surface-Default, #FF8652)",
+        // borderTop: isMobile ? "1px solid var(--Surface-Default, #FF8652)" : "",
+        // background:
+        //   selectedPage == totalPages
+        //     ? ""
+        //     : isMobile
+        //     ? orangeFlippedShadowTop
+        //     : orangeFlippedShadowRight,
       }}
     >
-      <img
+      {/* <img
         style={{
           maxWidth: "100%",
           maxHeight: "100%",
@@ -437,18 +233,189 @@ export default function StoryBookPage({
         }}
         src={page.iscoverImage ? page.right_cover_image : page.image}
         alt={"storyImage"}
-      />
+      /> */}
+      <div
+        style={{
+          backgroundColor: page.coverImage || page.image ? "white" : "wheat",
+          padding: page.iscoverImage ? "0" : "10px",
+          margin: "5% auto",
+          width: isMobile ? "90%" : "90%",
+          border:
+            page.coverImage || page.image
+              ? "0"
+              : "1px solid var(--Surface-Default, #FF8652)",
+          borderRadius: "10px",
+          position: "relative",
+          display: page.description ? "block" : "flex",
+          justifyContent: page.iscoverImage ? "center" : "center",
+          alignItems: page.iscoverImage ? "center" : "center",
+          height: page.iscoverImage ? "90%" : "",
+          fontSize: page.iscoverImage ? "30px" : "20px",
+          height: "fit-content",
+          overflow: "visible",
+          scrollbarWidth: "none",
+          height: isMobile ? "50%" : "85%", // new css 
+        }}
+      >
+        {page.coverImage || page.image ? (
+          <>
+            <img
+              style={{
+                maxWidth: "100%",
+                // maxHeight: "100%",
+                height: "90%",
+                width: "90%",
+              }}
+              src={page.coverImage || page.image}
+              alt={"storyImage"}
+            />
+          </>
+        ) : (
+          <>
+            {storyWords.length > 1 && storyWords.map((word, index) => (
+              <span
+                ref={spanRef}
+                key={`${word} ${index}`}
+                style={{
+                  cursor: "pointer",
+                  width: "fit-content",
+                  fontFamily: "Reddit Sans, sans-serif",
+                  borderRadius: "6px",
+                  position: "relative",
+                  // textAlign: "center",
+                  backgroundColor:
+                    selectedWord == `${word} ${index}`
+                      ? "var(--Surface-Default, #FF8652)"
+                      : "transparent",
+
+                }}
+                onClick={(e) => {
+                  if (showPopup) return;
+                  setWordMeaningAndUsage("");
+                  setSelectedWord(`${word} ${index}`);
+                  getWordMeaning(word);
+                  const viewportWidth = window.innerWidth;
+                  const viewportHeight = window.innerHeight;
+
+                  // Get click position relative to the viewport
+                  const clickXX = e.clientX;
+                  const clickYY = e.clientY;
+
+                  // Convert to vw and vh
+                  const clickXvw = (clickXX / viewportWidth) * 100;
+                  const clickYvh = (clickYY / viewportHeight) * 100;
+
+                  // console.log(
+                  //   `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${clickYvh.toFixed(2) - 14
+                  //   }vh`
+                  // );
+                  // console.log(e.target);
+                  // console.log(e.clientX);
+                  const currEle = e.target;
+                  const asdad = currEle.getBoundingClientRect();
+                  // console.log(asdad.left, ":::::", asdad.top);
+                  // console.log(e.clientX);
+                  // console.log(e.clientY);
+                  const clickX = e.clientX;
+                  const clickY = e.clientY;
+                  const parentDiv = e.target.parentElement;
+                  const parentRect = parentDiv.getBoundingClientRect();
+                  // console.log(parentRect.left, " parentRect ", parentRect.top);
+                  let element = e.target; // Target element
+                  let container = e.target.parentElement;
+                  // console.log({ element, container });
+                  let offset = getOffsetRelativeToContainer(element, container);
+                  // console.log(offset);
+                  // console.log(
+                  //   "Distance from container top: " + (offset.top - 40)
+                  // );
+                  // console.log(
+                  //   "Distance from container left: " + (offset.left - 40)
+                  // );
+
+                  const relativeX = clickX - parentRect.left;
+                  const relativeY = clickY - parentRect.top;
+                  // console.log(relativeX, "-----------------", relativeY);
+                  var viewwidth = clickXvw.toFixed(2) - 25;
+                  var viewheight = clickYvh.toFixed(2) - 14;
+                  // console.log("window.innerWidth", window.innerWidth);
+                  if (spanRef.current) {
+                    var adjust = isMobile ? 50 : 115;
+                    // console.log({ adjust });
+                    // top: relativeY + (isMobile ? 50 : 115),
+                    // left: relativeX + (isMobile ? 0 : 135),
+                    setPopupPosition({
+                      top:
+                        window.innnerWidth > 600 && window.innnerWidth < 830
+                          ? relativeX
+                          : relativeX,
+                      // offset.top - (isMobile ? 80 : isIpad ? 110 : 80) - 100,
+                      // offset.top - 40,
+                      left: offset.left - 40,
+
+                      // top: offset.top - 100,
+                      // left: offset.left - 60,
+                      // top: `${viewheight}vh`,
+                      // left: `${viewwidth}vw`,
+                    });
+                    setShowPopup(true);
+                  }
+                }}
+              >
+                {` ${word}  `}
+                {selectedWord == `${word} ${index}`
+                  ? gptRepsonseWordMeaning()
+                  : ""}
+              </span>
+            ))}
+
+            {question && answer && (
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <div style={{
+                  marginBottom: '1rem', borderRadius: "6px",
+                  padding: "5px",
+                  fontFamily: "Reddit Sans, sans-serif",
+                  backgroundColor: "rgb(255, 246, 230)"
+                }}>
+                  {question}
+                </div>
+
+                <div
+                  style={{
+                    paddingBottom: '0.5rem',
+                    borderRadius: "6px",
+                    fontFamily: "Reddit Sans, sans-serif",
+                    paddingRight: '0.5rem',
+                    padding: "5px",
+                    backgroundColor: 'rgb(229, 247, 222)',
+                  }}
+                >
+                  {answer.map((option, index) => (
+                    <div key={index}
+                    >
+                      {option}
+                    </div>
+                  ))}
+                </div>
+
+              </div>
+            )}
+
+
+          </>
+        )}
+      </div>
     </div>
   );
   function speak(speech) {
     return new Promise((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(speech);
-      console.log({ voices });
+      // console.log({ voices });
       utterance.rate = 0.9;
       const selectedVoice = voices.find((v) => v.lang === "en-US"); 
       utterance.voice = selectedVoice || voices[0];
       utterance.onend = () => resolve();
-      utterance.onerror = (event) => console.log("ERROR", event.error);
+      // utterance.onerror = (event) => console.log("ERROR", event.error);
       speechSynthesis.speak(utterance);
     });
   }
@@ -484,22 +451,19 @@ export default function StoryBookPage({
   const [answer,setanswer]=useState()
   useEffect(() => {
     if (page.description) {
+      setQuestion("")
       setStoryWords(page.description.split(" "));
       stopSpeaking();
-      setQuestion([])
-      setanswer("")
-    }
-    if(page.question){
+    } else if (page.question) {
       setStoryWords([])
-      setQuestion(page.question.split(""))
-      console.log(page.question,"question")
+      setQuestion(page.question);
+      setanswer(page.answer.split("\n"))
+      // console.log(page.question, "split")
+    } else {
+      setStoryWords([]);
+      stopSpeaking();
     }
-    if(page.answers){
-      setanswer(page.answers.split("\n"))
-      console.log(page.answers.split("\n"),"answer")
-    }
-
-  }, [page.pageNo, page.description,page.question,page.answers]);
+  }, [page.pageNo, page.description, page.question]);
 
   // wordMeaningAndUsage.word
   //                       .split("")
@@ -507,7 +471,7 @@ export default function StoryBookPage({
   //                         index === 0 ? alphabet.toUpperCase() : alphabet
   //                       )
   //                       .Join("")
-  console.log(isIpad && !isMobile);
+  // console.log(isIpad && !isMobile);
   const gptRepsonseWordMeaning = () => {
     return (
       <div
@@ -524,8 +488,8 @@ export default function StoryBookPage({
           fontSize: "18px",
           border: "1px solid #ff8652",
           zIndex: "2",
-          left: "0",
-          right: "10px",
+          // left: "0",
+          right: "-30px",
           // left: `${Number(popupPosition.left)}px`,
           // top: `${Number(popupPosition.top) + 10}px`,
           // left: popupPosition.left,
@@ -553,7 +517,9 @@ export default function StoryBookPage({
                 top: "-7px",
                 className: "gptResponseDiv",
                 zIndex: "-1",
-                left: "25px",
+                // left: "25px",
+                right:"25px",
+                
               }}
             ></div>
 
@@ -622,9 +588,9 @@ export default function StoryBookPage({
                       setIsSpeaking(true);
                       try {
                         await speak(wordMeaningAndUsage.word);
-                        console.log("Speech completed successfully.");
+                        // console.log("Speech completed successfully.");
                       } catch (error) {
-                        console.error("Error during speaking:", error);
+                        // console.error("Error during speaking:", error);
                       } finally {
                         setIsSpeaking(false);
                       }
@@ -732,7 +698,7 @@ export default function StoryBookPage({
           flexDirection: isMobile ? "column" : "row",
         }}
       >
-        <LeftPage />
+    
         <RightPage />
       </div>
       <div
@@ -845,9 +811,9 @@ export default function StoryBookPage({
                       setIsSpeaking(true);
                       try {
                         await speak(wordMeaningAndUsage.word);
-                        console.log("Speech completed successfully.");
+                        // console.log("Speech completed successfully.");
                       } catch (error) {
-                        console.error("Error during speaking:", error);
+                        // console.error("Error during speaking:", error);
                       } finally {
                         setIsSpeaking(false);
                       }
