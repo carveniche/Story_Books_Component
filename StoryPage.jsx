@@ -185,6 +185,7 @@ export default function StoryBookPage({
       setWordMeaningAndUsage("");
     }
   };
+  const [chatgpt,setChatgpt]=useState(0);
   function getOffsetRelativeToContainer(container, element) {
     let offsetTop = 0;
     let offsetLeft = 0;
@@ -199,7 +200,7 @@ export default function StoryBookPage({
     return { top: offsetTop, left: offsetLeft };
   }
 
-  
+
   const RightPage = () => (
     <div
       className="rightPage"
@@ -344,6 +345,7 @@ export default function StoryBookPage({
                     // console.log({ adjust });
                     // top: relativeY + (isMobile ? 50 : 115),
                     // left: relativeX + (isMobile ? 0 : 135),
+                    setChatgpt(asdad.bottom);
                     setPopupPosition({
                       top:
                         window.innnerWidth > 600 && window.innnerWidth < 830
@@ -494,6 +496,9 @@ export default function StoryBookPage({
           // top: `${Number(popupPosition.top) + 10}px`,
           // left: popupPosition.left,
           // top: popupPosition.top,
+          // top:"0px",
+          top: chatgpt < 400 ? "30px" : "auto",  // set top if chatgpt > 300
+          bottom: chatgpt >= 400 ? "30px" : "auto",  // set bottom if chatgpt <= 300
           maxHeight: "350px",
           // background: "var(--Surface-Default, #FF8652)",
           background: "var(--Surface-Default, #FF8652)",
@@ -507,14 +512,15 @@ export default function StoryBookPage({
               style={{
                 width: "20px",
                 height: "20px",
-                transform: "rotateZ(45deg)",
+                transform: chatgpt >= 400 ?"rotateZ(225deg)":"rotateZ(45deg)",
                 border: "1px solid white",
                 // background: "#ff8652",
                 position: "absolute",
                 borderWidth: "3px 0 0 3px",
                 borderColor: "#ff8652",
                 background: "white",
-                top: "-7px",
+                top: chatgpt < 400 ? "-7px" : "auto",
+                bottom:chatgpt >= 400 ? "-7px" : "auto",
                 className: "gptResponseDiv",
                 zIndex: "-1",
                 // left: "25px",
