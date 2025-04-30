@@ -11,7 +11,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
   const getHeight = () => {
     let output;
     if (isLiveClass) {
-      output = isMobile || isIpad ? "520px" : "490px";
+      output = isMobile || isIpad ? "520px" : "90%";
     } else {
       output = isMobile || isIpad ? "520px" : "600px";
     }
@@ -19,11 +19,11 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
   };
 
   const getWidth = () => {
-    return isLiveClass ? "80%" : "90%";
+    return isLiveClass ? "85%" : "90%";
   };
 
   const getMargin = () => {
-    return isLiveClass ? "0px auto" : "5% auto";
+    return isLiveClass ? "3% auto" : "5% auto";
   }
 
   const [storyData, setStoryData] = useState([]);
@@ -124,7 +124,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
               style={{
                 display: "flex",
                 justifyContent: "space-evenly",
-                padding: "10px",
+                paddingTop: "10px",
               }}
             >
               <button
@@ -214,7 +214,6 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
                 mobileScrollSupport={false}
                 onFlip={handlePageChange}
                 className="demo-book"
-                style={{}}
                 startPage={1}
                 useMouseEvents={false}
               >
@@ -235,7 +234,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
               <HTMLFlipBook
                 width={400}
                 ref={flipBookRef}
-                height={400}
+                height={350}
                 size="stretch"
                 maxShadowOpacity={0.5}
                 showCover={true}

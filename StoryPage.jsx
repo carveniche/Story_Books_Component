@@ -116,6 +116,7 @@ export default function StoryBookPage({
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
   const form = new FormData();
+   const debounceRef = useRef(null);  
   const getWordMeaning = async (word) => {
     form.append(
       'prompt_text',
@@ -186,6 +187,7 @@ export default function StoryBookPage({
     }
   };
   const [chatgpt,setChatgpt]=useState(0);
+  const [chatgptRight,setChatgptRight]=useState(0);
   function getOffsetRelativeToContainer(container, element) {
     let offsetTop = 0;
     let offsetLeft = 0;
@@ -294,7 +296,14 @@ export default function StoryBookPage({
                   if (showPopup) return;
                   setWordMeaningAndUsage("");
                   setSelectedWord(`${word} ${index}`);
-                  getWordMeaning(word);
+                  if (debounceRef.current) {
+                    clearTimeout(debounceRef.current);
+                  }
+              
+                  // Set a new timeout
+                  debounceRef.current = setTimeout(() => {
+                    getWordMeaning(word);
+                  }, 3000);
                   const viewportWidth = window.innerWidth;
                   const viewportHeight = window.innerHeight;
 
@@ -346,6 +355,8 @@ export default function StoryBookPage({
                     // top: relativeY + (isMobile ? 50 : 115),
                     // left: relativeX + (isMobile ? 0 : 135),
                     setChatgpt(asdad.bottom);
+                    console.log(asdad.right,"right")
+                    setChatgptRight(asdad.right);
                     setPopupPosition({
                       top:
                         window.innnerWidth > 600 && window.innnerWidth < 830
@@ -490,13 +501,15 @@ export default function StoryBookPage({
           fontSize: "18px",
           border: "1px solid #ff8652",
           zIndex: "2",
-          // left: "0",
+          // left: "0px",
           right: "-30px",
           // left: `${Number(popupPosition.left)}px`,
           // top: `${Number(popupPosition.top) + 10}px`,
           // left: popupPosition.left,
           // top: popupPosition.top,
           // top:"0px",
+          left:chatgptRight<300? "-30px" :"auto",
+          right: chatgptRight>=300? "-30px":"auto",
           top: chatgpt < 400 ? "30px" : "auto",  // set top if chatgpt > 300
           bottom: chatgpt >= 400 ? "30px" : "auto",  // set bottom if chatgpt <= 300
           maxHeight: "350px",
@@ -524,7 +537,9 @@ export default function StoryBookPage({
                 className: "gptResponseDiv",
                 zIndex: "-1",
                 // left: "25px",
-                right:"25px",
+                // right:"25px",
+                left:chatgptRight<300? "25px" :"auto",
+                right: chatgptRight>=300? "25px":"auto",
                 
               }}
             ></div>

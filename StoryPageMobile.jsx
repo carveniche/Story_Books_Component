@@ -113,6 +113,9 @@ export default function StoryBookPageMobile({
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
   const form = new FormData();
+  const [chatgpt,setChatgpt]=useState(0);
+  const [chatgptRight,setChatgptRight]=useState(0);
+  const debounceRef = useRef(null);  
   const getWordMeaning = async (word) => {
     form.append(
       'prompt_text',
@@ -291,7 +294,12 @@ export default function StoryBookPageMobile({
                   if (showPopup) return;
                   setWordMeaningAndUsage("");
                   setSelectedWord(`${word} ${index}`);
-                  getWordMeaning(word);
+                  if (debounceRef.current) {
+                    clearTimeout(debounceRef.current);
+                  }
+                  debounceRef.current = setTimeout(() => {
+                    getWordMeaning(word);
+                  }, 3000);
                   const viewportWidth = window.innerWidth;
                   const viewportHeight = window.innerHeight;
 
@@ -312,7 +320,7 @@ export default function StoryBookPageMobile({
                   // console.log(e.clientX);
                   const currEle = e.target;
                   const asdad = currEle.getBoundingClientRect();
-                  // console.log(asdad.left, ":::::", asdad.top);
+                  // console.log(asdad.bottom, "chatgpt --", asdad.top);
                   // console.log(e.clientX);
                   // console.log(e.clientY);
                   const clickX = e.clientX;
@@ -341,8 +349,12 @@ export default function StoryBookPageMobile({
                   if (spanRef.current) {
                     var adjust = isMobile ? 50 : 115;
                     // console.log({ adjust });
+                    console.log(asdad.right,"right")
+                    setChatgptRight(asdad.right);
+                    setChatgpt(asdad.bottom);
                     // top: relativeY + (isMobile ? 50 : 115),
                     // left: relativeX + (isMobile ? 0 : 135),
+                    // console.log(relativeX,"left")
                     setPopupPosition({
                       top:
                         window.innnerWidth > 600 && window.innnerWidth < 830
@@ -428,17 +440,21 @@ export default function StoryBookPageMobile({
           display: `${showPopup ? "flex" : "none"}`,
           flexDirection: "column",
           gap: "19px",
-          width: isIpad ? "85%" : "85%",
+          width: isIpad ? "300px" : "300px",
           borderRadius: "10px",
           height: "fit-content",
-          // position: "absolute",
-          position: "fixed",
+          position: "absolute",
+          // position: "fixed",
           padding: "3px 8px",
           fontSize: "18px",
           border: "1px solid #ff8652",
           zIndex: "2",
-          left: isIpad ? "10%" : "5%",
-          right: "10px",
+          top: chatgpt < 400 ? "auto" : "auto",  // set top if chatgpt > 300
+          bottom: chatgpt >= 400 ? "30px" : "auto",  // set bottom if chatgpt <= 300
+          left: chatgptRight< 500 ? "auto": "auto",
+          right:chatgptRight >=500 ?"-20px":"auto", 
+          // left: isIpad ? "1%" : "auto",
+          // right: "10px",
           // left: `${Number(popupPosition.left)}px`,
           // top: `${Number(popupPosition.top) + 10}px`,
           // left: popupPosition.left,
@@ -456,18 +472,21 @@ export default function StoryBookPageMobile({
               style={{
                 width: "20px",
                 height: "20px",
-                transform: "rotateZ(45deg)",
+                transform: chatgpt >= 400 ?"rotateZ(225deg)":"rotateZ(45deg)",
                 border: "1px solid white",
                 // background: "#ff8652",
                 position: "absolute",
                 borderWidth: "3px 0 0 3px",
                 borderColor: "#ff8652",
                 background: "white",
-                top: "-7px",
+                top: chatgpt < 400 ? "-7px" : "auto",
+                bottom:chatgpt >= 400 ? "-7px" : "auto",
                 className: "gptResponseDiv",
                 zIndex: "-1",
-                // left: "20px",
-                left: `${isIpad ? popupPosition.top : popupPosition.top}px`,
+                // left: "25px",
+                left: chatgptRight< 500 ? "26px": "auto",
+                right:chatgptRight >=500 ?"20px":"auto", 
+                // left: `${isIpad ? popupPosition.top-5 : popupPosition.top}px`,
               }}
             ></div>
 
@@ -673,7 +692,7 @@ export default function StoryBookPageMobile({
         width: isMobile ? "98%" : isIpad ? "90%" : "100%",
         height: "90%",
         margin: "auto",
-        backfaceVisibility: "none",
+        // backfaceVisibility: "none",
       }}
     >
       <div
