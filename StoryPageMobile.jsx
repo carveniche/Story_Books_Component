@@ -3,6 +3,7 @@ import styles from "./StoryBook.module.css";
 import axios from "axios";
 import "./story_books.css"
 import BaseUrl from "../../../../api/ApiConfig";
+// import BaseUrl from "./api/ApiConfig";
 export default function StoryBookPageMobile({
   page,
   totalPages,
@@ -215,15 +216,6 @@ export default function StoryBookPageMobile({
         display: "flex",
         alignItems: page.description ? "flex-start" : "center",
         justifyContent: "center",
-        background: "white",
-        // borderLeft: isMobile ? "" : "1px solid var(--Surface-Default, #FF8652)",
-        // borderTop: isMobile ? "1px solid var(--Surface-Default, #FF8652)" : "",
-        // background:
-        //   selectedPage == totalPages
-        //     ? ""
-        //     : isMobile
-        //     ? orangeFlippedShadowTop
-        //     : orangeFlippedShadowRight,
       }}
     >
       {/* <img
@@ -240,21 +232,17 @@ export default function StoryBookPageMobile({
       /> */}
       <div
         style={{
-          backgroundColor: page.coverImage || page.image ? "white" : "wheat",
+
           padding: page.iscoverImage ? "0" : "10px",
           margin: "5% auto",
-          width: isMobile ? "90%" : "70%",
-          border:
-            page.coverImage || page.image
-              ? "0"
-              : "1px solid var(--Surface-Default, #FF8652)",
-          borderRadius: "10px",
+          width: isMobile ? "95%" : "70%",
+         
           position: "relative",
           display: page.description ? "block" : "flex",
           justifyContent: page.iscoverImage ? "center" : "center",
           alignItems: page.iscoverImage ? "center" : "center",
           height: page.iscoverImage ? "90%" : "",
-          fontSize: page.iscoverImage ? "30px" : "20px",
+          fontSize: page.iscoverImage ? "30px" : "22px",
           height: "fit-content",
           overflow: "visible",
           scrollbarWidth: "none",
@@ -702,8 +690,6 @@ export default function StoryBookPageMobile({
           margin: "1rem auto",
           width: "95%",
           gap: "1px",
-          borderRadius: "20px",
-          border: "1px solid var(--Surface-Default, #FF8652)",
           height: "100%",
           display: "flex",
           justifyContent: "center",
@@ -713,9 +699,7 @@ export default function StoryBookPageMobile({
         }}
       >
         <RightPage />
-        {/* {page.coverImage || page.description ? <RightPage /> : "checking"} */}
-        {/* <LeftPage />
-        <RightPage /> */}
+        
       </div>
       <div
         className="gptResponseDiv"

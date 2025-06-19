@@ -11,11 +11,7 @@ export default function StoryBookPage({
   isMobile,
   isIpad,
 }) {
-  // console.log("isMobile", isMobile);
-  // console.log("isIpad", isIpad);
-  // console.log({ page, totalPages, selectedPage });
-  // console.log(page);
-
+  
   var orangeFlippedShadowLeft =
     "linear-gradient(270deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
   var orangeFlippedShadowRight =
@@ -29,14 +25,6 @@ export default function StoryBookPage({
   var blackFlippedShadowRight =
     "linear-gradient(90deg,rgba(0,0,0,.118) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,rgba(0,0,0,.05) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
 
-  var wordddd = {
-    word: "exploring",
-    type: "verb",
-    meaning:
-      "Examining or evaluating an unfamiliar area or subject for the purpose of discovering information or something new",
-    usage:
-      "John loves exploring the forest behind his house for new kinds of bugs and plants.",
-  };
   const EarIcon = () => {
     return (
       <svg
@@ -132,14 +120,8 @@ export default function StoryBookPage({
       const content = res?.data?.choices?.[0]?.message?.content;
     
       if (content) {
-        // console.log("GPT Response:", content);
         setWordMeaningAndUsage(JSON.parse(content));
-        // Optional: parse content if it's a JSON string
         const parsed = JSON.parse(content);
-        // console.log("Word:", parsed.word);
-        // console.log("Type:", parsed.type);
-        // console.log("Usage:", parsed.usage);
-        // console.log("Meaning:", parsed.meaning);
       } else {
         setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
@@ -210,54 +192,28 @@ export default function StoryBookPage({
         width: "100%",
         height: "100%",
         overflow: "visible",
-        // position: "relative",
         display: "flex",
         alignItems: page.description ? "flex-start" : "center",
         justifyContent: "center",
-        background: "white",
-        // borderLeft: isMobile ? "" : "1px solid var(--Surface-Default, #FF8652)",
-        // borderTop: isMobile ? "1px solid var(--Surface-Default, #FF8652)" : "",
-        // background:
-        //   selectedPage == totalPages
-        //     ? ""
-        //     : isMobile
-        //     ? orangeFlippedShadowTop
-        //     : orangeFlippedShadowRight,
       }}
     >
-      {/* <img
-        style={{
-          maxWidth: "100%",
-          maxHeight: "100%",
-          width: "90%",
-          height: "-webkit-fill-available",
-          padding: isMobile ? "0" : "",
-          margin: isMobile ? "20px " : "50px",
-        }}
-        src={page.iscoverImage ? page.right_cover_image : page.image}
-        alt={"storyImage"}
-      /> */}
+     
       <div
         style={{
-          backgroundColor: page.coverImage || page.image ? "white" : "wheat",
           padding: page.iscoverImage ? "0" : "10px",
-          margin: "5% auto",
-          width: isMobile ? "90%" : "90%",
-          border:
-            page.coverImage || page.image
-              ? "0"
-              : "1px solid var(--Surface-Default, #FF8652)",
+          margin: "1% auto",
+          width: isMobile ? "90%" : "100%",
           borderRadius: "10px",
           position: "relative",
           display: page.description ? "block" : "flex",
           justifyContent: page.iscoverImage ? "center" : "center",
           alignItems: page.iscoverImage ? "center" : "center",
           height: page.iscoverImage ? "90%" : "",
-          fontSize: page.iscoverImage ? "30px" : "20px",
+          fontSize: page.iscoverImage ? "30px" : "22px",
           height: "fit-content",
           overflow: "visible",
           scrollbarWidth: "none",
-          height: isMobile ? "50%" : "85%", // new css 
+          height: isMobile ? "50%" : "90%", // new css 
         }}
       >
         {page.coverImage || page.image ? (
@@ -265,7 +221,6 @@ export default function StoryBookPage({
             <img
               style={{
                 maxWidth: "100%",
-                // maxHeight: "100%",
                 height: "90%",
                 width: "90%",
               }}
@@ -314,46 +269,25 @@ export default function StoryBookPage({
                   // Convert to vw and vh
                   const clickXvw = (clickXX / viewportWidth) * 100;
                   const clickYvh = (clickYY / viewportHeight) * 100;
-
-                  // console.log(
-                  //   `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${clickYvh.toFixed(2) - 14
-                  //   }vh`
-                  // );
-                  // console.log(e.target);
-                  // console.log(e.clientX);
                   const currEle = e.target;
                   const asdad = currEle.getBoundingClientRect();
-                  // console.log(asdad.left, ":::::", asdad.top);
-                  // console.log(e.clientX);
-                  // console.log(e.clientY);
                   const clickX = e.clientX;
                   const clickY = e.clientY;
                   const parentDiv = e.target.parentElement;
                   const parentRect = parentDiv.getBoundingClientRect();
-                  // console.log(parentRect.left, " parentRect ", parentRect.top);
                   let element = e.target; // Target element
                   let container = e.target.parentElement;
-                  // console.log({ element, container });
+                
                   let offset = getOffsetRelativeToContainer(element, container);
-                  // console.log(offset);
-                  // console.log(
-                  //   "Distance from container top: " + (offset.top - 40)
-                  // );
-                  // console.log(
-                  //   "Distance from container left: " + (offset.left - 40)
-                  // );
-
+                  
                   const relativeX = clickX - parentRect.left;
                   const relativeY = clickY - parentRect.top;
-                  // console.log(relativeX, "-----------------", relativeY);
+                 
                   var viewwidth = clickXvw.toFixed(2) - 25;
                   var viewheight = clickYvh.toFixed(2) - 14;
-                  // console.log("window.innerWidth", window.innerWidth);
+                 
                   if (spanRef.current) {
                     var adjust = isMobile ? 50 : 115;
-                    // console.log({ adjust });
-                    // top: relativeY + (isMobile ? 50 : 115),
-                    // left: relativeX + (isMobile ? 0 : 135),
                     setChatgpt(asdad.bottom);
                     console.log(asdad.right,"right")
                     setChatgptRight(asdad.right);
@@ -362,14 +296,9 @@ export default function StoryBookPage({
                         window.innnerWidth > 600 && window.innnerWidth < 830
                           ? relativeX
                           : relativeX,
-                      // offset.top - (isMobile ? 80 : isIpad ? 110 : 80) - 100,
-                      // offset.top - 40,
                       left: offset.left - 40,
 
-                      // top: offset.top - 100,
-                      // left: offset.left - 60,
-                      // top: `${viewheight}vh`,
-                      // left: `${viewwidth}vw`,
+                 
                     });
                     setShowPopup(true);
                   }
@@ -478,13 +407,6 @@ export default function StoryBookPage({
     }
   }, [page.pageNo, page.description, page.question]);
 
-  // wordMeaningAndUsage.word
-  //                       .split("")
-  //                       .map((alphabet, index) =>
-  //                         index === 0 ? alphabet.toUpperCase() : alphabet
-  //                       )
-  //                       .Join("")
-  // console.log(isIpad && !isMobile);
   const gptRepsonseWordMeaning = () => {
     return (
       <div
@@ -501,19 +423,15 @@ export default function StoryBookPage({
           fontSize: "18px",
           border: "1px solid #ff8652",
           zIndex: "2",
-          // left: "0px",
+          
           right: "-30px",
-          // left: `${Number(popupPosition.left)}px`,
-          // top: `${Number(popupPosition.top) + 10}px`,
-          // left: popupPosition.left,
-          // top: popupPosition.top,
-          // top:"0px",
+          
           left:chatgptRight<300? "-30px" :"auto",
           right: chatgptRight>=300? "-30px":"auto",
           top: chatgpt < 400 ? "30px" : "auto",  // set top if chatgpt > 300
           bottom: chatgpt >= 400 ? "30px" : "auto",  // set bottom if chatgpt <= 300
           maxHeight: "350px",
-          // background: "var(--Surface-Default, #FF8652)",
+          
           background: "var(--Surface-Default, #FF8652)",
         }}
       >
@@ -527,7 +445,7 @@ export default function StoryBookPage({
                 height: "20px",
                 transform: chatgpt >= 400 ?"rotateZ(225deg)":"rotateZ(45deg)",
                 border: "1px solid white",
-                // background: "#ff8652",
+               
                 position: "absolute",
                 borderWidth: "3px 0 0 3px",
                 borderColor: "#ff8652",
@@ -536,8 +454,7 @@ export default function StoryBookPage({
                 bottom:chatgpt >= 400 ? "-7px" : "auto",
                 className: "gptResponseDiv",
                 zIndex: "-1",
-                // left: "25px",
-                // right:"25px",
+              
                 left:chatgptRight<300? "25px" :"auto",
                 right: chatgptRight>=300? "25px":"auto",
                 
@@ -700,22 +617,17 @@ export default function StoryBookPage({
     <div
       style={{
         // width: !isMobile && isIpad ? "85%" : isMobile ? "98%" : "100%",
-        width: isMobile ? "98%" : isIpad ? "90%" : "100%",
-        height: "95%",
+        width: isMobile ? "98%" : isIpad ? "90%" : "90%",
+        height: "100%",
         margin: "auto",
       }}
     >
       <div
         className={"book"}
         style={{
-          padding: " 0 10px ",
-          margin: "1rem auto",
           width: "95%",
-          gap: "1px",
           borderRadius: "20px",
-          border: "1px solid var(--Surface-Default, #FF8652)",
           height: "100%",
-          display: "flex",
           flexDirection: isMobile ? "column" : "row",
         }}
       >
@@ -738,10 +650,7 @@ export default function StoryBookPage({
           zIndex: "2",
           left: `${Number(popupPosition.left)}px`,
           top: `${Number(popupPosition.top) + 10}px`,
-          // left: popupPosition.left,
-          // top: popupPosition.top,
           maxHeight: "350px",
-          // background: "var(--Surface-Default, #FF8652)",
           background: "var(--Surface-Default, #FF8652)",
         }}
       >

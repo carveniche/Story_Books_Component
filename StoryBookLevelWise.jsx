@@ -13,7 +13,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
     if (isLiveClass) {
       output = isMobile || isIpad ? "520px" : "90%";
     } else {
-      output = isMobile || isIpad ? "520px" : "600px";
+      output = isMobile || isIpad ? "100%" : "100%";
     }
     return output;
   };
@@ -23,7 +23,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
   };
 
   const getMargin = () => {
-    return isLiveClass ? "3% auto" : "5% auto";
+    return isLiveClass ? role_name==="tutor" ? "1% auto": "3% auto" : "5% auto";
   }
 
   const [storyData, setStoryData] = useState([]);
@@ -48,7 +48,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
 
     var bookPagesMobile = JSON.parse(book.story_data);
     var totalPagesMobile = [];
-    // console.log(bookPagesMobile,"bookPagesMobile")
+
     let firstPage=true;
     bookPagesMobile.cover_images.forEach((bk) => {
       totalPagesMobile.push({ coverImage: bk.left ? bk.left : bk.right });
@@ -66,16 +66,15 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
       totalPagesMobile.push({ image: bk.image });
     });
     setStoryDataMobile(totalPagesMobile);
-    // console.log(totalPagesMobile,"totalPagesMobiletotalPagesMobile")
   }, [book]);
 
   // const flipBookRef = useRef(null);
   const [currentPage,setCurrentPage]=useState(0)
 
+
   // Modified handlePageChange to sync with flip book
   const handlePageChange = (e) => {
     const newPage = e.data;
-    // console.log(newPage,storyDataMobile.length,"newPagechange")
     if (newPage !== currPage) {
       pageChange(newPage);
       setCurrentPage(newPage)
@@ -83,9 +82,6 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
   };
 
  
-  
-
-  
   
 
   return (
@@ -103,11 +99,12 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
               alignItems: "center",
             }}
           >
+            <p></p>
             <p>{book.name} </p>
             <button
               className="card_primary_button"
               style={{
-                position: isMobile ? "relative" : "absolute",
+                position: isMobile ? "relative" : "",
                 width: isMobile ? "50%" : "18%",
                 left: isMobile ? "" : "73%",
                 height: "fit-content",
@@ -124,7 +121,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
               style={{
                 display: "flex",
                 justifyContent: "space-evenly",
-                paddingTop: "10px",
+                paddingTop: "5px",
               }}
             >
               <button
@@ -167,6 +164,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
               height: getHeight(),
               width: getWidth(),
               margin: getMargin(),
+              gap: "20px",
               position: isMobile ? "relative" : "",
               transition: "transform 0.5s",
             }}
@@ -175,7 +173,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
             {!isMobile && (isLiveClass ? role_name === "tutor" : true) && (
               <button
                 className={`card_primary_button ${currentPage <= 1 ? "disabled" : ""
-                  } ${(isLiveClass && checkFirstDevice && (pageChangeTab !== "left")) || currentPage <= 1 ? "cursor-not-allowed opacity-50 bg-[#FF8652]" : "bg-[#FF8652]"} `}
+                } ${(isLiveClass && checkFirstDevice && (pageChangeTab !== "left")) || currentPage <= 1 ? "cursor-not-allowed opacity-50 bg-[#FF8652]" : "bg-[#FF8652]"} `}
                 style={{
                   height: "fit-content",
                   padding: "15px 10px",
@@ -205,7 +203,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
 
             {isMobile?(
               <HTMLFlipBook
-              ref={flipBookRef}
+                ref={flipBookRef}
                 width={500}
                 height={500}
                 size="fixed"
@@ -214,11 +212,12 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
                 mobileScrollSupport={false}
                 onFlip={handlePageChange}
                 className="demo-book"
+                flippingTime={500}
                 startPage={1}
                 useMouseEvents={false}
               >
                 {storyDataMobile.map((selectedbook, index) => (
-                  <div key={index} className="demoPage">
+                  <div key={index} className="demoPage" >
                     <StoryBookPageMobile
                       isMobile={isMobile}
                       isIpad={isIpad}
@@ -232,19 +231,20 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
               </HTMLFlipBook>
             ) : (
               <HTMLFlipBook
-                width={400}
+                width={isLiveClass ? 400 : 450}
                 ref={flipBookRef}
-                height={350}
+                height={isLiveClass ? 350 : 600}
                 size="stretch"
                 maxShadowOpacity={0.5}
                 showCover={true}
                 onFlip={handlePageChange}
-                className="demo-book"
+                className="demo-book "
                 startPage={1}
+                flippingTime={500}
                 useMouseEvents={false}
               >
                 {storyDataMobile.map((selectedbook, index) => (
-                  <div key={index} className="demoPage">
+                  <div key={index} className="demoPage" >
                     <StoryBookPage
                       isMobile={isMobile}
                       isIpad={isIpad}
@@ -261,7 +261,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
             {!isMobile && (isLiveClass ? role_name === "tutor" : true) && (
               <button
                 className={`card_primary_button ${currentPage >= storyDataMobile.length - 3 ? "disabled" : ""
-                  } ${(isLiveClass && checkFirstDevice && (pageChangeTab !== "right")) || currentPage >= storyDataMobile.length - 3 ? "cursor-not-allowed opacity-50 bg-[#FF8652]" : "bg-[#FF8652]"} `}
+                } ${(isLiveClass && checkFirstDevice && (pageChangeTab !== "right")) || currentPage >= storyDataMobile.length - 3 ? "cursor-not-allowed opacity-50 bg-[#FF8652]" : "bg-[#FF8652]"} `}
                 style={{
                   padding: "15px 10px",
                   border: "none",
