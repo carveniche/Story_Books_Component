@@ -234,7 +234,7 @@ export default function StoryBookPageMobile({
         style={{
 
           padding: page.iscoverImage ? "0" : "10px",
-          margin: "5% auto",
+          // margin: "5% auto",
           width: isMobile ? "95%" : "70%",
          
           position: "relative",
@@ -242,7 +242,7 @@ export default function StoryBookPageMobile({
           justifyContent: page.iscoverImage ? "center" : "center",
           alignItems: page.iscoverImage ? "center" : "center",
           height: page.iscoverImage ? "90%" : "",
-          fontSize: page.iscoverImage ? "30px" : "22px",
+          fontSize: page.iscoverImage ? "30px" : "21px",
           height: "fit-content",
           overflow: "visible",
           scrollbarWidth: "none",
@@ -686,8 +686,8 @@ export default function StoryBookPageMobile({
       <div
         className={"book"}
         style={{
-          padding: " 0 10px ",
-          margin: "1rem auto",
+          // padding: " 0 10px ",
+          // margin: "1rem auto",
           width: "95%",
           gap: "1px",
           height: "100%",

@@ -11,7 +11,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
   const getHeight = () => {
     let output;
     if (isLiveClass) {
-      output = isMobile || isIpad ? "520px" : "90%";
+      output = isMobile || isIpad ? "500px" : "90%";
     } else {
       output = isMobile || isIpad ? "100%" : "100%";
     }
