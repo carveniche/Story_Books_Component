@@ -57,3 +57,21 @@
       transform: rotate(-360deg);
     }
   }
+  
+  .--left {
+    /* Shadow on the right side */
+    background-color: #f2f4f7;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    
+  }
+  
+  .--right {
+    padding-right: 10px;
+    background-color: #f2f4f7;
+   
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px,
+      inset 10px 0 10px -5px #e4dddd; /* Left inner shadow only */
+  }
+  .--portrait {
+    padding-bottom: 50% !important;
+  }

@@ -2,7 +2,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./StoryBook.module.css";
 import axios from "axios";
 import "./story_books.css"
-import BaseUrl from "../../../../api/ApiConfig";
+// import BaseUrl from "../../../../api/ApiConfig";
+import BaseUrl from "./api/ApiConfig";
 export default function StoryBookPageMobile({
   page,
   totalPages,
@@ -10,8 +11,8 @@ export default function StoryBookPageMobile({
   isMobile,
   isIpad,
 }) {
-  console.log("isMobile", isMobile);
-  console.log("isIpad", isIpad);
+  // console.log("isMobile", isMobile);
+  // console.log("isIpad", isIpad);
 
   var orangeFlippedShadowLeft =
     "linear-gradient(270deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
@@ -113,6 +114,9 @@ export default function StoryBookPageMobile({
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
   const form = new FormData();
+  const [chatgpt,setChatgpt]=useState(0);
+  const [chatgptRight,setChatgptRight]=useState(0);
+  const debounceRef = useRef(null);  
   const getWordMeaning = async (word) => {
     form.append(
       'prompt_text',
@@ -129,14 +133,14 @@ export default function StoryBookPageMobile({
       const content = res?.data?.choices?.[0]?.message?.content;
     
       if (content) {
-        console.log("GPT Response:", content);
+        // console.log("GPT Response:", content);
         setWordMeaningAndUsage(JSON.parse(content));
         // Optional: parse content if it's a JSON string
         const parsed = JSON.parse(content);
-        console.log("Word:", parsed.word);
-        console.log("Type:", parsed.type);
-        console.log("Usage:", parsed.usage);
-        console.log("Meaning:", parsed.meaning);
+        // console.log("Word:", parsed.word);
+        // console.log("Type:", parsed.type);
+        // console.log("Usage:", parsed.usage);
+        // console.log("Meaning:", parsed.meaning);
       } else {
         setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
@@ -212,15 +216,6 @@ export default function StoryBookPageMobile({
         display: "flex",
         alignItems: page.description ? "flex-start" : "center",
         justifyContent: "center",
-        background: "white",
-        // borderLeft: isMobile ? "" : "1px solid var(--Surface-Default, #FF8652)",
-        // borderTop: isMobile ? "1px solid var(--Surface-Default, #FF8652)" : "",
-        // background:
-        //   selectedPage == totalPages
-        //     ? ""
-        //     : isMobile
-        //     ? orangeFlippedShadowTop
-        //     : orangeFlippedShadowRight,
       }}
     >
       {/* <img
@@ -237,21 +232,17 @@ export default function StoryBookPageMobile({
       /> */}
       <div
         style={{
-          backgroundColor: page.coverImage || page.image ? "white" : "wheat",
+
           padding: page.iscoverImage ? "0" : "10px",
           margin: "5% auto",
-          width: isMobile ? "90%" : "70%",
-          border:
-            page.coverImage || page.image
-              ? "0"
-              : "1px solid var(--Surface-Default, #FF8652)",
-          borderRadius: "10px",
+          width: isMobile ? "95%" : "70%",
+         
           position: "relative",
           display: page.description ? "block" : "flex",
           justifyContent: page.iscoverImage ? "center" : "center",
           alignItems: page.iscoverImage ? "center" : "center",
           height: page.iscoverImage ? "90%" : "",
-          fontSize: page.iscoverImage ? "30px" : "20px",
+          fontSize: page.iscoverImage ? "30px" : "22px",
           height: "fit-content",
           overflow: "visible",
           scrollbarWidth: "none",
@@ -291,7 +282,12 @@ export default function StoryBookPageMobile({
                   if (showPopup) return;
                   setWordMeaningAndUsage("");
                   setSelectedWord(`${word} ${index}`);
-                  getWordMeaning(word);
+                  if (debounceRef.current) {
+                    clearTimeout(debounceRef.current);
+                  }
+                  debounceRef.current = setTimeout(() => {
+                    getWordMeaning(word);
+                  }, 3000);
                   const viewportWidth = window.innerWidth;
                   const viewportHeight = window.innerHeight;
 
@@ -303,46 +299,50 @@ export default function StoryBookPageMobile({
                   const clickXvw = (clickXX / viewportWidth) * 100;
                   const clickYvh = (clickYY / viewportHeight) * 100;
 
-                  console.log(
-                    `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${
-                      clickYvh.toFixed(2) - 14
-                    }vh`
-                  );
-                  console.log(e.target);
-                  console.log(e.clientX);
+                  // console.log(
+                  //   `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${
+                  //     clickYvh.toFixed(2) - 14
+                  //   }vh`
+                  // );
+                  // console.log(e.target);
+                  // console.log(e.clientX);
                   const currEle = e.target;
                   const asdad = currEle.getBoundingClientRect();
-                  console.log(asdad.left, ":::::", asdad.top);
-                  console.log(e.clientX);
-                  console.log(e.clientY);
+                  // console.log(asdad.bottom, "chatgpt --", asdad.top);
+                  // console.log(e.clientX);
+                  // console.log(e.clientY);
                   const clickX = e.clientX;
                   const clickY = e.clientY;
                   const parentDiv = e.target.parentElement;
                   const parentRect = parentDiv.getBoundingClientRect();
-                  console.log(parentRect.left, " parentRect ", parentRect.top);
+                  // console.log(parentRect.left, " parentRect ", parentRect.top);
                   let element = e.target; // Target element
                   let container = e.target.parentElement;
-                  console.log({ element, container });
+                  // console.log({ element, container });
                   let offset = getOffsetRelativeToContainer(element, container);
-                  console.log(offset);
-                  console.log(
-                    "Distance from container top: " + (offset.top - 40)
-                  );
-                  console.log(
-                    "Distance from container left: " + (offset.left - 40)
-                  );
+                  // console.log(offset);
+                  // console.log(
+                  //   "Distance from container top: " + (offset.top - 40)
+                  // );
+                  // console.log(
+                  //   "Distance from container left: " + (offset.left - 40)
+                  // );
 
                   const relativeX = clickX - parentRect.left;
                   const relativeY = clickY - parentRect.top;
-                  console.log(relativeX, "-----------------", relativeY);
+                  // console.log(relativeX, "-----------------", relativeY);
                   var viewwidth = clickXvw.toFixed(2) - 25;
                   var viewheight = clickYvh.toFixed(2) - 14;
-                  console.log("window.innerWidth", window.innerWidth);
+                  // console.log("window.innerWidth", window.innerWidth);
                   if (spanRef.current) {
                     var adjust = isMobile ? 50 : 115;
-                    console.log({ adjust });
+                    // console.log({ adjust });
+                    console.log(asdad.right,"right")
+                    setChatgptRight(asdad.right);
+                    setChatgpt(asdad.bottom);
                     // top: relativeY + (isMobile ? 50 : 115),
                     // left: relativeX + (isMobile ? 0 : 135),
+                    // console.log(relativeX,"left")
                     setPopupPosition({
                       top:
                         window.innnerWidth > 600 && window.innnerWidth < 830
@@ -371,22 +371,30 @@ export default function StoryBookPageMobile({
             {question && answer && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <div style={{ marginBottom: '1rem', borderRadius: "6px",
+                    padding: "5px",
                      fontFamily: "Reddit Sans, sans-serif",  
                      backgroundColor: "rgb(255, 246, 230)"}}>
                     {question}
                   </div>
-                  {answer.map((option, index) => (
-                    <div key={index} 
+
+                  <div
                     style={{ 
                       paddingBottom: '0.5rem',
                       borderRadius: "6px",
                       fontFamily: "Reddit Sans, sans-serif",
                       paddingRight: '0.5rem',
+                      padding: "5px",
                       backgroundColor: 'rgb(229, 247, 222)',
-                      }}>
+                      }}
+                  >
+                  {answer.map((option, index) => (
+                    <div key={index} 
+                    >
                     {option}
                   </div>
                 ))}
+                  </div>
+                  
               </div>
             )}    
 
@@ -399,12 +407,12 @@ export default function StoryBookPageMobile({
   function speak(speech) {
     return new Promise((resolve, reject) => {
       const utterance = new SpeechSynthesisUtterance(speech);
-      console.log({ voices });
-      utterance.rate = 0.9;
+      // console.log({ voices });
+      utterance.rate = 0.7;
       const selectedVoice = voices.find((v) => v.lang === "en-US"); 
       utterance.voice = selectedVoice || voices[0];
       utterance.onend = () => resolve();
-      utterance.onerror = (event) => console.log("ERROR", event.error);
+      // utterance.onerror = (event) => console.log("ERROR", event.error);
       speechSynthesis.speak(utterance);
     });
   }
@@ -420,17 +428,21 @@ export default function StoryBookPageMobile({
           display: `${showPopup ? "flex" : "none"}`,
           flexDirection: "column",
           gap: "19px",
-          width: isIpad ? "85%" : "300px",
+          width: isIpad ? "300px" : "300px",
           borderRadius: "10px",
           height: "fit-content",
-          // position: "absolute",
-          position: "fixed",
+          position: "absolute",
+          // position: "fixed",
           padding: "3px 8px",
           fontSize: "18px",
           border: "1px solid #ff8652",
           zIndex: "2",
-          left: isIpad ? "10%" : "0",
-          right: "10px",
+          top: chatgpt < 400 ? "auto" : "auto",  // set top if chatgpt > 300
+          bottom: chatgpt >= 400 ? "30px" : "auto",  // set bottom if chatgpt <= 300
+          left: chatgptRight< 500 ? "auto": "auto",
+          right:chatgptRight >=500 ?"-20px":"auto", 
+          // left: isIpad ? "1%" : "auto",
+          // right: "10px",
           // left: `${Number(popupPosition.left)}px`,
           // top: `${Number(popupPosition.top) + 10}px`,
           // left: popupPosition.left,
@@ -448,18 +460,21 @@ export default function StoryBookPageMobile({
               style={{
                 width: "20px",
                 height: "20px",
-                transform: "rotateZ(45deg)",
+                transform: chatgpt >= 400 ?"rotateZ(225deg)":"rotateZ(45deg)",
                 border: "1px solid white",
                 // background: "#ff8652",
                 position: "absolute",
                 borderWidth: "3px 0 0 3px",
                 borderColor: "#ff8652",
                 background: "white",
-                top: "-7px",
+                top: chatgpt < 400 ? "-7px" : "auto",
+                bottom:chatgpt >= 400 ? "-7px" : "auto",
                 className: "gptResponseDiv",
                 zIndex: "-1",
-                // left: "20px",
-                left: `${isIpad ? popupPosition.top : popupPosition.top}px`,
+                // left: "25px",
+                left: chatgptRight< 500 ? "26px": "auto",
+                right:chatgptRight >=500 ?"20px":"auto", 
+                // left: `${isIpad ? popupPosition.top-5 : popupPosition.top}px`,
               }}
             ></div>
 
@@ -528,9 +543,9 @@ export default function StoryBookPageMobile({
                       setIsSpeaking(true);
                       try {
                         await speak(wordMeaningAndUsage.word);
-                        console.log("Speech completed successfully.");
+                        // console.log("Speech completed successfully.");
                       } catch (error) {
-                        console.error("Error during speaking:", error);
+                        // console.error("Error during speaking:", error);
                       } finally {
                         setIsSpeaking(false);
                       }
@@ -651,7 +666,7 @@ export default function StoryBookPageMobile({
       setStoryWords([])
       setquestion(page.question);
       setAnswer(page.answer.split("\n"))
-      console.log(page.question,"split")
+      // console.log(page.question,"split")
     } else {
       setStoryWords([]);
       stopSpeaking();
@@ -665,7 +680,7 @@ export default function StoryBookPageMobile({
         width: isMobile ? "98%" : isIpad ? "90%" : "100%",
         height: "90%",
         margin: "auto",
-        backfaceVisibility: "none",
+        // backfaceVisibility: "none",
       }}
     >
       <div
@@ -675,8 +690,6 @@ export default function StoryBookPageMobile({
           margin: "1rem auto",
           width: "95%",
           gap: "1px",
-          borderRadius: "20px",
-          border: "1px solid var(--Surface-Default, #FF8652)",
           height: "100%",
           display: "flex",
           justifyContent: "center",
@@ -686,9 +699,7 @@ export default function StoryBookPageMobile({
         }}
       >
         <RightPage />
-        {/* {page.coverImage || page.description ? <RightPage /> : "checking"} */}
-        {/* <LeftPage />
-        <RightPage /> */}
+        
       </div>
       <div
         className="gptResponseDiv"
@@ -800,9 +811,9 @@ export default function StoryBookPageMobile({
                       setIsSpeaking(true);
                       try {
                         await speak(wordMeaningAndUsage.word);
-                        console.log("Speech completed successfully.");
+                        // console.log("Speech completed successfully.");
                       } catch (error) {
-                        console.error("Error during speaking:", error);
+                        // console.error("Error during speaking:", error);
                       } finally {
                         setIsSpeaking(false);
                       }
