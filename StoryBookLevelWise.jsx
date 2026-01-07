@@ -34,7 +34,6 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
     isLiveClass ? theme.breakpoints.down("lg") : theme.breakpoints.down("lg")
   );
   const isIpad = useMediaQuery(theme.breakpoints.down("md"));
-  console.log(isMobile,"mobilsdfsdfsde")
 
   useEffect(() => {
     var bookPages = JSON.parse(book?.story_data);
