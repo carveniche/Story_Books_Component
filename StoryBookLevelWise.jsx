@@ -257,6 +257,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
                       totalPages={storyDataMobile.length}
                       selectedPage={index + 1}
                       page={selectedbook}
+                      currentPage={currentPage}
                     />
                   </div>
                 ))}
