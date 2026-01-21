@@ -60,7 +60,14 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
     });
     bookPagesMobile.pages.forEach((bk) => {
       if (bk.description.length > 1) {
-        totalPagesMobile.push({ description: bk.description });
+        totalPagesMobile.push({ description: bk.description
+          ,
+          audio: {
+            src: bk?.text_audio,          // audio file URL
+            timestamps: bk?.audio_timestamp // word timing array
+          }
+         });
+        
       } else if (bk.question) {
         totalPagesMobile.push({ question: bk.question, answer: bk.answers });
       }
@@ -229,6 +236,7 @@ export default function StoryBookLevelWise({ pageNext,flipBookRef,pagePrev, book
                       totalPages={storyDataMobile.length}
                       selectedPage={index + 1}
                       page={selectedbook}
+                      currentPage={currentPage}
                     />
                   </div>
                 ))}

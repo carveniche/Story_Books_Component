@@ -12,32 +12,6 @@ export default function StoryBookPage({
   isIpad,
   currentPage,
 }) {
-  // console.log("isMobile", isMobile);
-  // console.log("isIpad", isIpad);
-  console.log(page, totalPages, selectedPage, "selectedPage");
-  // console.log(page);
-
-  var orangeFlippedShadowLeft =
-    "linear-gradient(270deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
-  var orangeFlippedShadowRight =
-    "linear-gradient(90deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
-  var orangeFlippedShadowBottom =
-    "linear-gradient(0deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
-  var orangeFlippedShadowTop =
-    "linear-gradient(180deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
-  var blackFlippedShadowLeft =
-    "linear-gradient(270deg,rgba(0,0,0,.118) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,rgba(0,0,0,.05) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
-  var blackFlippedShadowRight =
-    "linear-gradient(90deg,rgba(0,0,0,.118) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,rgba(0,0,0,.05) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
-
-  var wordddd = {
-    word: "exploring",
-    type: "verb",
-    meaning:
-      "Examining or evaluating an unfamiliar area or subject for the purpose of discovering information or something new",
-    usage:
-      "John loves exploring the forest behind his house for new kinds of bugs and plants.",
-  };
   const EarIcon = () => {
     return (
       <svg
@@ -116,77 +90,93 @@ export default function StoryBookPage({
   const [wordMeaningAndUsage, setWordMeaningAndUsage] = useState("");
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
-  const form = new FormData();
-  const debounceRef = useRef(null);
+  const abortControllerRef = useRef(null);
+  const storybookRef = useRef(null);
+  // const getWordMeaning = async (word) => {
+  //   form.append(
+  //     'prompt_text',
+  //     `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
+  //   );
+  //   try {
+  //     const response = await axios.post(BaseUrl + '/app_teachers/gpt_response', form, {
+  //       headers: {
+  //         'Content-Type': 'multipart/form-data'
+  //       }
+  //     })
+  //     const res = response.data; // Axios automatically parses JSON
+  //     const content = res?.data?.choices?.[0]?.message?.content;
+
+  //     if (content) {
+  //       // console.log("GPT Response:", content);
+  //       setWordMeaningAndUsage(JSON.parse(content));
+  //       // Optional: parse content if it's a JSON string
+  //       const parsed = JSON.parse(content);
+  //       // console.log("Word:", parsed.word);
+  //       // console.log("Type:", parsed.type);
+  //       // console.log("Usage:", parsed.usage);
+  //       // console.log("Meaning:", parsed.meaning);
+  //     } else {
+  //       setGptErrorMessage("Please Connect with Tech Team ")
+  //       console.warn("No content in response.");
+  //     }
+  //   } catch (error) {
+  //     console.error("ErrorErrorErrorError", error);
+  //     if (error.response.data.error)
+  //       setGptErrorMessage(
+  //         "Unable to complete you request, Please try after some time"
+  //       );
+  //   }
+  // };
   const getWordMeaning = async (word) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+    const form = new FormData();
     form.append(
       'prompt_text',
-      `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
+      `Please give me meaning, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
     );
+
     try {
-      const response = await axios.post(BaseUrl + '/app_teachers/gpt_response', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      const response = await axios.post(
+        BaseUrl + "/app_teachers/gpt_response",
+        form,
+        {
+          signal: controller.signal, // ✅ important
+          headers: { "Content-Type": "multipart/form-data" },
         }
-      })
-      const res = response.data; // Axios automatically parses JSON
-      const content = res?.data?.choices?.[0]?.message?.content;
+      );
+
+      const content = response?.data?.data?.choices?.[0]?.message?.content;
 
       if (content) {
-        // console.log("GPT Response:", content);
         setWordMeaningAndUsage(JSON.parse(content));
-        // Optional: parse content if it's a JSON string
-        const parsed = JSON.parse(content);
-        // console.log("Word:", parsed.word);
-        // console.log("Type:", parsed.type);
-        // console.log("Usage:", parsed.usage);
-        // console.log("Meaning:", parsed.meaning);
-      } else {
+        setGptErrorMessage("");
+      }
+      else {
         setGptErrorMessage("Please Connect with Tech Team ")
-        console.warn("No content in response.");
       }
     } catch (error) {
-      console.error("ErrorErrorErrorError", error);
-      if (error.response.data.error)
-        setGptErrorMessage(
-          "Unable to complete you request, Please try after some time"
-        );
+      if (error.name === "CanceledError") {
+        // ✅ expected, do nothing
+        return;
+      }
+      setGptErrorMessage("Unable to fetch word meaning.");
     }
   };
-  var wordMeaning = {
-    to: {
-      word: "to",
-      type: "preposition",
-      use: "indicating direction or destination",
-      meaning: "Shows the direction or destination of movement.",
-    },
-    shining: {
-      word: "shining",
-      type: "adjective",
-      use: "describing something that emits or reflects light",
-      meaning: "Giving off or reflecting a lot of light; radiant.",
-    },
-    Lucas: {
-      word: "Lucas",
-      type: "proper noun",
-      use: "personal name",
-      meaning:
-        "Lucas is a common given name of Latin origin, meaning 'light' or 'illumination'. It is derived from the Latin name 'Lucius'.",
-    },
-  };
-  var wordMeaning2 = {
-    word: "to",
-    type: "preposition",
-    use: "indicating direction or destination",
-    meaning: "Shows the direction or destination of movement.",
-  };
-  const handleOutsideClick = (event) => {
-    if (!event) return;
-    if (!event.target.classList.contains("gptrepsonse")) {
-      setShowPopup(false);
-      setWordMeaningAndUsage("");
-    }
-  };
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
   const [chatgpt, setChatgpt] = useState(0);
   const [chatgptRight, setChatgptRight] = useState(0);
   function getOffsetRelativeToContainer(container, element) {
@@ -203,77 +193,97 @@ export default function StoryBookPage({
     return { top: offsetTop, left: offsetLeft };
   }
   const [speakingIndex, setSpeakingIndex] = useState(-1);
-  const speechSessionRef = useRef(0);
-  const isSpeakingRef = useRef(false);
-  async function speakStoryWords(words) {
-    if (!words || words.length === 0) return;
+  const audioRef = useRef(null);
 
-    // 🔁 Invalidate previous speech session
-    speechSessionRef.current += 1;
-    const mySession = speechSessionRef.current;
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
-    isSpeakingRef.current = true;
+  const playPollyAudio = (page) => {
+    if (!page?.audio?.src || !page?.audio?.timestamps) return;
 
-    speechSynthesis.cancel();
-    setSpeakingIndex(-1);
+    const { src, timestamps } = page.audio;
 
-    for (let i = 0; i < words.length; i++) {
-      // ❌ Stop if a newer session started
-      if (speechSessionRef.current !== mySession) break;
+    if (!audioRef.current) {
+      audioRef.current = new Audio(src);
+    } else {
+      audioRef.current.pause();
+      audioRef.current.src = src;
+    }
 
-      setSpeakingIndex(i);
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
+    setIsAudioPlaying(true);
 
-      await new Promise((resolve) => {
-        const utterance = new SpeechSynthesisUtterance(words[i]);
-        utterance.rate = 0.7;
+    audioRef.current.ontimeupdate = () => {
+      const currentMs = audioRef.current.currentTime * 1000;
 
-        const selectedVoice = voices.find(v => v.lang === "en-US");
-        utterance.voice = selectedVoice || voices[0];
-
-        utterance.onend = resolve;
-        utterance.onerror = resolve;
-
-        speechSynthesis.speak(utterance);
+      const index = timestamps.findIndex((mark, i) => {
+        const next = timestamps[i + 1];
+        return (
+          currentMs >= mark.timestamp &&
+          (!next || currentMs < next.timestamp)
+        );
       });
-    }
 
-    // Clear only if this session is still valid
-    if (speechSessionRef.current === mySession) {
-      isSpeakingRef.current = false;
-      setSpeakingIndex(-1);
-    }
-  }
-  const stopAllSpeech = () => {
-    speechSessionRef.current += 1;
-    speechSynthesis.cancel();
-    setSpeakingIndex(-1);
-    isSpeakingRef.current = false;
+      if (index !== -1) {
+        setSpeakingIndex(index);
+      }
+    };
+
+    audioRef.current.onended = stopAudio;
   };
-  
+
+
+
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsAudioPlaying(false);
+    setSpeakingIndex(-1);
+  };
+
+
 
   useEffect(() => {
     if (selectedWord) {
-      stopAllSpeech()
+      stopAudio(); // ✅ cleanup on unmount
     }
     return () => {
-      speechSynthesis.cancel();
+      stopAudio(); // ✅ cleanup on unmount
     };
 
   }, [selectedWord]);
   useEffect(() => {
     return () => {
-      stopAllSpeech();
+      stopAudio(); // ✅ cleanup on unmount
     };
   }, []);
 
+
   useEffect(() => {
-    stopAllSpeech();
+    stopAudio();
   }, [currentPage]);
 
   useEffect(() => {
-    window.addEventListener("beforeunload", stopAllSpeech);
+    window.addEventListener("beforeunload", stopAudio);
     return () => {
-      window.removeEventListener("beforeunload", stopAllSpeech);
+      window.removeEventListener("beforeunload", stopAudio);
+    };
+  }, []);
+  useEffect(() => {
+    function handleClickOutside(event) {
+
+      if (storybookRef.current && !storybookRef.current.contains(event.target)) {
+        stopAudio();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -285,28 +295,43 @@ export default function StoryBookPage({
         width: "100%",
         height: "100%",
         overflow: "visible",
-        // position: "relative",
         borderRadius: "20px",
         display: "flex",
+        flexDirection: page.description ? "column" : "column",
         alignItems: page.description ? "flex-start" : "center",
         justifyContent: "center",
-        // background: "",
-        // backgroundColor: "#FFF3E0", // light orange
-        // boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-        // borderRadius: "8px",
       }}
     >
+      {page?.description && (
+        <div>
+          <button onClick={() => playPollyAudio(page)} className="audio-btn" style={{ cursor: "pointer" }}>
+            <svg
+              className="audio-icon"
+              width="50"
+              height="35"
+              viewBox="0 0 24 30"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              {/* Ear */}
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+
+              {/* Wave paths */}
+              <path className={`wave wave1 ${isAudioPlaying ? "animate" : ""}`} d="M15 9a6 4 0 0 1 0 6" />
+              <path className={`wave wave2 ${isAudioPlaying ? "animate" : ""}`} d="M18 7a10 7 0 0 1 0 10" />
+              <path className={`wave wave3 ${isAudioPlaying ? "animate" : ""}`} d="M21 5a14 10 0 0 1 0 14" />
+
+            </svg>
+          </button>
+        </div>
+      )}
 
       <div
         style={{
-          // backgroundColor: page.coverImage || page.image ? "white" : "wheat",
           padding: page.iscoverImage ? "0" : "10px",
-          margin: "5% auto",
+          // margin: "5% auto",
           width: isMobile ? "90%" : "90%",
-          // border:
-          //   page.coverImage || page.image
-          //     ? "0"
-          //     : "1px solid var(--Surface-Default, #FF8652)",
           borderRadius: "10px",
           position: "relative",
           display: page.description ? "flex" : "flex",
@@ -328,7 +353,6 @@ export default function StoryBookPage({
             <img
               style={{
                 maxWidth: "100%",
-                // maxHeight: "100%",
                 height: "90%",
                 width: "90%",
               }}
@@ -338,121 +362,83 @@ export default function StoryBookPage({
           </>
         ) : (
           <div>
-            <div
+            {/* <div
               style={{ width: "20px", cursor: "pointer" }}
-              onClick={() => speakStoryWords(storyWords)}
+              onClick={() => playPollyAudio(page)}
             >
               <EarIcon />
-            </div>
+            </div> */}
 
-            {storyWords.length > 1 && storyWords.map((word, index) => (
-              <span
-                ref={spanRef}
-                key={`${word} ${index}`}
-                data-word-index={index}
-                style={{
-                  cursor: "pointer",
-                  width: "fit-content",
-                  fontFamily: "Reddit Sans, sans-serif",
-                  borderRadius: "6px",
-                  position: "relative",
-                  // textAlign: "center",
-                  backgroundColor:
-                    selectedWord == `${word} ${index}`
-                      ? "var(--Surface-Default, #FF8652)"
-                      : speakingIndex == index ? "var(--Surface-Default, #FF8652)"
-                        : "transparent",
+            {storyWords.length > 1 && storyWords.map((word, index) => {
+              console.log(speakingIndex, index, "speakingIndex")
+              return (
+                <span
+                  ref={spanRef}
+                  key={`${word} ${index}`}
+                  data-word-index={index}
+                  style={{
+                    cursor: "pointer",
+                    width: "fit-content",
+                    fontFamily: "Reddit Sans, sans-serif",
+                    borderRadius: "6px",
+                    position: "relative",
+                    // textAlign: "center",
+                    backgroundColor:
+                      selectedWord == `${word} ${index}`
+                        ? "var(--Surface-Default, #FF8652)"
+                        : speakingIndex == index ? "var(--Surface-Default, #FF8652)"
+                          : "transparent",
 
-                }}
-                onClick={(e) => {
-                  if (showPopup) return;
-                  setWordMeaningAndUsage("");
-                  setSelectedWord(`${word} ${index}`);
-                  if (debounceRef.current) {
-                    clearTimeout(debounceRef.current);
-                  }
-
-                  // Set a new timeout
-                  debounceRef.current = setTimeout(() => {
+                  }}
+                  onClick={(e) => {
+                    if (showPopup) return;
+                    setWordMeaningAndUsage("");
+                    setSelectedWord(`${word} ${index}`);
                     getWordMeaning(word);
-                  }, 3000);
-                  const viewportWidth = window.innerWidth;
-                  const viewportHeight = window.innerHeight;
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+                    const clickXX = e.clientX;
+                    const clickYY = e.clientY;
+                    const clickXvw = (clickXX / viewportWidth) * 100;
+                    const clickYvh = (clickYY / viewportHeight) * 100;
+                    const currEle = e.target;
+                    const asdad = currEle.getBoundingClientRect();
+                    const clickX = e.clientX;
+                    const clickY = e.clientY;
+                    const parentDiv = e.target.parentElement;
+                    const parentRect = parentDiv.getBoundingClientRect();
+                    let element = e.target; // Target element
+                    let container = e.target.parentElement;
+                    let offset = getOffsetRelativeToContainer(element, container);
 
-                  // Get click position relative to the viewport
-                  const clickXX = e.clientX;
-                  const clickYY = e.clientY;
+                    const relativeX = clickX - parentRect.left;
+                    const relativeY = clickY - parentRect.top;
+                    var viewwidth = clickXvw.toFixed(2) - 25;
+                    var viewheight = clickYvh.toFixed(2) - 14;
+                    if (spanRef.current) {
 
-                  // Convert to vw and vh
-                  const clickXvw = (clickXX / viewportWidth) * 100;
-                  const clickYvh = (clickYY / viewportHeight) * 100;
+                      setChatgpt(asdad.bottom);
+                      console.log(asdad.right, "right")
+                      setChatgptRight(asdad.right);
+                      setPopupPosition({
+                        top:
+                          window.innnerWidth > 600 && window.innnerWidth < 830
+                            ? relativeX
+                            : relativeX,
 
-                  // console.log(
-                  //   `Click Position: ${clickXvw.toFixed(2) - 5}vw, ${clickYvh.toFixed(2) - 14
-                  //   }vh`
-                  // );
-                  // console.log(e.target);
-                  // console.log(e.clientX);
-                  const currEle = e.target;
-                  const asdad = currEle.getBoundingClientRect();
-                  // console.log(asdad.left, ":::::", asdad.top);
-                  // console.log(e.clientX);
-                  // console.log(e.clientY);
-                  const clickX = e.clientX;
-                  const clickY = e.clientY;
-                  const parentDiv = e.target.parentElement;
-                  const parentRect = parentDiv.getBoundingClientRect();
-                  // console.log(parentRect.left, " parentRect ", parentRect.top);
-                  let element = e.target; // Target element
-                  let container = e.target.parentElement;
-                  // console.log({ element, container });
-                  let offset = getOffsetRelativeToContainer(element, container);
-                  // console.log(offset);
-                  // console.log(
-                  //   "Distance from container top: " + (offset.top - 40)
-                  // );
-                  // console.log(
-                  //   "Distance from container left: " + (offset.left - 40)
-                  // );
-
-                  const relativeX = clickX - parentRect.left;
-                  const relativeY = clickY - parentRect.top;
-                  // console.log(relativeX, "-----------------", relativeY);
-                  var viewwidth = clickXvw.toFixed(2) - 25;
-                  var viewheight = clickYvh.toFixed(2) - 14;
-                  // console.log("window.innerWidth", window.innerWidth);
-                  if (spanRef.current) {
-                    var adjust = isMobile ? 50 : 115;
-                    // console.log({ adjust });
-                    // top: relativeY + (isMobile ? 50 : 115),
-                    // left: relativeX + (isMobile ? 0 : 135),
-                    setChatgpt(asdad.bottom);
-                    console.log(asdad.right, "right")
-                    setChatgptRight(asdad.right);
-                    setPopupPosition({
-                      top:
-                        window.innnerWidth > 600 && window.innnerWidth < 830
-                          ? relativeX
-                          : relativeX,
-                      // offset.top - (isMobile ? 80 : isIpad ? 110 : 80) - 100,
-                      // offset.top - 40,
-                      left: offset.left - 40,
-
-                      // top: offset.top - 100,
-                      // left: offset.left - 60,
-                      // top: `${viewheight}vh`,
-                      // left: `${viewwidth}vw`,
-                    });
-                    setShowPopup(true);
-                  }
-                }}
-              >
-                {` ${word}  `}
-                {selectedWord == `${word} ${index}`
-                  ? gptRepsonseWordMeaning()
-                  : ""}
-              </span>
-            ))}
+                        left: offset.left - 40,
+                      });
+                      setShowPopup(true);
+                    }
+                  }}
+                >
+                  {` ${word}  `}
+                  {selectedWord == `${word} ${index}`
+                    ? gptRepsonseWordMeaning()
+                    : ""}
+                </span>
+              )
+            })}
 
             {question && answer && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -763,6 +749,7 @@ export default function StoryBookPage({
   };
   return (
     <div
+      ref={storybookRef} // <-- Add this
       style={{
         // width: !isMobile && isIpad ? "85%" : isMobile ? "98%" : "100%",
         width: isMobile ? "98%" : isIpad ? "90%" : "90%",
@@ -773,16 +760,9 @@ export default function StoryBookPage({
       <div
         className={"book"}
         style={{
-          // padding: " 0 5px ",
-          // margin: "1rem auto",
           width: "95%",
-          // gap: "1px",
-          // backgroundColor: "#FFF3E0",
           borderRadius: "20px",
-          // boxShadow: "0 10px 15px rgba(0, 0, 0, 0.2)",
-
           height: "100%",
-          // display: "flex",
           flexDirection: isMobile ? "column" : "row",
         }}
       >
@@ -805,10 +785,7 @@ export default function StoryBookPage({
           zIndex: "2",
           left: `${Number(popupPosition.left)}px`,
           top: `${Number(popupPosition.top) + 10}px`,
-          // left: popupPosition.left,
-          // top: popupPosition.top,
           maxHeight: "350px",
-          // background: "var(--Surface-Default, #FF8652)",
           background: "var(--Surface-Default, #FF8652)",
         }}
       >

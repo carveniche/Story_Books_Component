@@ -10,6 +10,7 @@ export default function StoryBookPageMobile({
   selectedPage,
   isMobile,
   isIpad,
+  currentPage,
 }) {
   // console.log("isMobile", isMobile);
   // console.log("isIpad", isIpad);
@@ -120,7 +121,7 @@ export default function StoryBookPageMobile({
   const getWordMeaning = async (word) => {
     form.append(
       'prompt_text',
-      `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
+      `Please give me meaning, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
     );
 
     try{
@@ -143,10 +144,10 @@ export default function StoryBookPageMobile({
         // console.log("Meaning:", parsed.meaning);
       } else {
         setGptErrorMessage("Please Connect with Tech Team ")
-        console.warn("No content in response.");
+        // console.warn("No content in response.");
       }
     }catch(error){
-      console.error("ErrorErrorErrorError", error);
+      // console.error("ErrorErrorErrorError", error);
       if (error.response.data.error)
         setGptErrorMessage(
           "Unable to complete you request, Please try after some time"
@@ -204,6 +205,96 @@ export default function StoryBookPageMobile({
     popup.style.width = `${window.innerWidth * 0.8}px`;
     popup.style.height = `${window.innerHeight * 0.8}px`;
   }
+  const storybookRef = useRef(null);
+  const [speakingIndex, setSpeakingIndex] = useState(-1);
+  const audioRef = useRef(null);
+
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+
+  const playPollyAudio = (page) => {
+    if (!page?.audio?.src || !page?.audio?.timestamps) return;
+
+    const { src, timestamps } = page.audio;
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio(src);
+    } else {
+      audioRef.current.pause();
+      audioRef.current.src = src;
+    }
+
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
+    setIsAudioPlaying(true);
+
+    audioRef.current.ontimeupdate = () => {
+      const currentMs = audioRef.current.currentTime * 1000;
+
+      const index = timestamps.findIndex((mark, i) => {
+        const next = timestamps[i + 1];
+        return (
+          currentMs >= mark.timestamp &&
+          (!next || currentMs < next.timestamp)
+        );
+      });
+
+      if (index !== -1) {
+        setSpeakingIndex(index);
+      }
+    };
+
+    audioRef.current.onended = stopAudio;
+  };
+
+
+
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsAudioPlaying(false);
+    setSpeakingIndex(-1);
+  };
+
+
+  useEffect(() => {
+    if (selectedWord) {
+      stopAudio(); // ✅ cleanup on unmount
+    }
+    return () => {
+      stopAudio(); // ✅ cleanup on unmount
+    };
+
+  }, [selectedWord]);
+  useEffect(() => {
+    return () => {
+      stopAudio(); // ✅ cleanup on unmount
+    };
+  }, []);
+
+
+  useEffect(() => {
+    stopAudio();
+  }, [currentPage]);
+
+
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+
+      if (storybookRef.current && !storybookRef.current.contains(event.target)) {
+        stopAudio();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const RightPage = () => (
     <div
@@ -212,24 +303,14 @@ export default function StoryBookPageMobile({
         width: "100%",
         height: "90%",
         overflow: "visible",
-        // position: "relative",
         display: "flex",
+        // flexDirection: page.description ? "column" : "column",
         alignItems: page.description ? "flex-start" : "center",
         justifyContent: "center",
+        placeContent: "center",
+          placeItems: page.description ? "center stretch" : undefined,
       }}
     >
-      {/* <img
-        style={{
-          maxWidth: "100%",
-          maxHeight: "100%",
-          width: "90%",
-          height: "-webkit-fill-available",
-          padding: isMobile ? "0" : "",
-          margin: isMobile ? "20px " : "50px",
-        }}
-        src={page.iscoverImage ? page.right_cover_image : page.image}
-        alt={"storyImage"}
-      /> */}
       <div
         style={{
 
@@ -274,9 +355,10 @@ export default function StoryBookPageMobile({
                   borderRadius: "6px",
                   position: "relative",
                   backgroundColor:
-                    selectedWord == `${word} ${index}`
-                      ? "var(--Surface-Default, #FF8652)"
-                      : "transparent",
+                      selectedWord == `${word} ${index}`
+                        ? "var(--Surface-Default, #FF8652)"
+                        : speakingIndex == index ? "var(--Surface-Default, #FF8652)"
+                          : "transparent",
                 }}
                 onClick={(e) => {
                   if (showPopup) return;
@@ -337,7 +419,7 @@ export default function StoryBookPageMobile({
                   if (spanRef.current) {
                     var adjust = isMobile ? 50 : 115;
                     // console.log({ adjust });
-                    console.log(asdad.right,"right")
+                    // console.log(asdad.right,"right")
                     setChatgptRight(asdad.right);
                     setChatgpt(asdad.bottom);
                     // top: relativeY + (isMobile ? 50 : 115),
@@ -675,6 +757,7 @@ export default function StoryBookPageMobile({
 
   return (
     <div
+    ref={storybookRef} // <-- Add this
       style={{
         // width: !isMobile && isIpad ? "85%" : isMobile ? "98%" : "100%",
         width: isMobile ? "98%" : isIpad ? "90%" : "100%",
@@ -686,18 +769,42 @@ export default function StoryBookPageMobile({
       <div
         className={"book"}
         style={{
-          padding: " 0 10px ",
-          margin: "1rem auto",
-          width: "95%",
+          padding: " 0 5px ",
+          margin: "0.5rem auto",
+          width: "100%",
           gap: "1px",
           height: "100%",
           display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "row",
+          // justifyContent: "center",
+          // alignItems: "center",
+          flexDirection: "column",
           // flexDirection: isMobile ? "column" : "row",
         }}
       >
+        {page?.description && (
+        <div>
+          <button onClick={() => playPollyAudio(page)} className="audio-btn" style={{ cursor: "pointer" }}>
+            <svg
+              className="audio-icon"
+              width="50"
+              height="35"
+              viewBox="0 0 24 30"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              {/* Ear */}
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+
+              {/* Wave paths */}
+              <path className={`wave wave1 ${isAudioPlaying ? "animate" : ""}`} d="M15 9a6 4 0 0 1 0 6" />
+              <path className={`wave wave2 ${isAudioPlaying ? "animate" : ""}`} d="M18 7a10 7 0 0 1 0 10" />
+              <path className={`wave wave3 ${isAudioPlaying ? "animate" : ""}`} d="M21 5a14 10 0 0 1 0 14" />
+
+            </svg>
+          </button>
+        </div>
+      )}
         <RightPage />
         
       </div>
