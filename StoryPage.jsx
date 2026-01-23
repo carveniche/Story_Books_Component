@@ -10,8 +10,9 @@ export default function StoryBookPage({
   selectedPage,
   isMobile,
   isIpad,
+  currentPage,
 }) {
-  
+
   var orangeFlippedShadowLeft =
     "linear-gradient(270deg,var(--Surface-Default, #FF8652) .65%,hsla(0,0%,100%,.2) 1.53%,hsla(0,0%,100%,.1) 2.38%,var(--Surface-Default, #FF8652) 3.26%,hsla(0,0%,100%,.14) 5.68%,hsla(0,0%,96%,0) 6.96%)";
   var orangeFlippedShadowRight =
@@ -104,21 +105,21 @@ export default function StoryBookPage({
   const [voices, setVoices] = useState([]);
   const [gptErrorMessage, setGptErrorMessage] = useState("");
   const form = new FormData();
-   const debounceRef = useRef(null);  
+  const debounceRef = useRef(null);
   const getWordMeaning = async (word) => {
     form.append(
       'prompt_text',
       `Please give me menaing, type of the word and a example usage for the word ${word}, for smaller grade students to understand,  in json format with keys word,type,give single usage with key usage,and meaning`
     );
-    try{
-      const response = await axios.post(BaseUrl+'/app_teachers/gpt_response', form, {
+    try {
+      const response = await axios.post(BaseUrl + '/app_teachers/gpt_response', form, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       })
       const res = response.data; // Axios automatically parses JSON
       const content = res?.data?.choices?.[0]?.message?.content;
-    
+
       if (content) {
         setWordMeaningAndUsage(JSON.parse(content));
         const parsed = JSON.parse(content);
@@ -126,7 +127,7 @@ export default function StoryBookPage({
         setGptErrorMessage("Please Connect with Tech Team ")
         console.warn("No content in response.");
       }
-    }catch(error){
+    } catch (error) {
       console.error("ErrorErrorErrorError", error);
       if (error.response.data.error)
         setGptErrorMessage(
@@ -168,8 +169,8 @@ export default function StoryBookPage({
       setWordMeaningAndUsage("");
     }
   };
-  const [chatgpt,setChatgpt]=useState(0);
-  const [chatgptRight,setChatgptRight]=useState(0);
+  const [chatgpt, setChatgpt] = useState(0);
+  const [chatgptRight, setChatgptRight] = useState(0);
   function getOffsetRelativeToContainer(container, element) {
     let offsetTop = 0;
     let offsetLeft = 0;
@@ -183,7 +184,78 @@ export default function StoryBookPage({
     // console.log(element, container);
     return { top: offsetTop, left: offsetLeft };
   }
+  const [speakingIndex, setSpeakingIndex] = useState(-1);
+  const audioRef = useRef(null);
 
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const playPollyAudio = (page) => {
+    if (!page?.audio?.src || !page?.audio?.timestamps) return;
+
+    const { src, timestamps } = page.audio;
+
+    if (!audioRef.current) {
+      audioRef.current = new Audio(src);
+    } else {
+      audioRef.current.pause();
+      audioRef.current.src = src;
+    }
+
+    audioRef.current.currentTime = 0;
+    audioRef.current.play();
+    setIsAudioPlaying(true);
+
+    audioRef.current.ontimeupdate = () => {
+      const currentMs = audioRef.current.currentTime * 1000;
+
+      const index = timestamps.findIndex((mark, i) => {
+        const next = timestamps[i + 1];
+        return (
+          currentMs >= mark.timestamp &&
+          (!next || currentMs < next.timestamp)
+        );
+      });
+
+      if (index !== -1) {
+        setSpeakingIndex(index);
+      }
+    };
+
+    audioRef.current.onended = stopAudio;
+  };
+
+
+
+
+  const stopAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsAudioPlaying(false);
+    setSpeakingIndex(-1);
+  };
+
+
+
+  useEffect(() => {
+    if (selectedWord) {
+      stopAudio();
+    }
+    return () => {
+      stopAudio();
+    };
+
+  }, [selectedWord]);
+
+  useEffect(() => {
+    return () => {
+      stopAudio();
+    };
+  }, []);
+
+  useEffect(() => {
+    stopAudio();
+  }, [currentPage]);
 
   const RightPage = () => (
     <div
@@ -197,7 +269,30 @@ export default function StoryBookPage({
         justifyContent: "center",
       }}
     >
-     
+      {page?.description && page?.audio?.timestamps && (
+        <div>
+          <button onClick={() => playPollyAudio(page)} className="audio-btn" style={{ cursor: "pointer" }}>
+            <svg
+              className="audio-icon"
+              width="50"
+              height="35"
+              viewBox="0 0 24 30"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              {/* Ear */}
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+
+              {/* Wave paths */}
+              <path className={`wave wave1 ${isAudioPlaying ? "animate" : ""}`} d="M15 9a6 4 0 0 1 0 6" />
+              <path className={`wave wave2 ${isAudioPlaying ? "animate" : ""}`} d="M18 7a10 7 0 0 1 0 10" />
+              <path className={`wave wave3 ${isAudioPlaying ? "animate" : ""}`} d="M21 5a14 10 0 0 1 0 14" />
+
+            </svg>
+          </button>
+        </div>
+      )}
       <div
         style={{
           padding: page.iscoverImage ? "0" : "10px",
@@ -214,6 +309,8 @@ export default function StoryBookPage({
           overflow: "visible",
           scrollbarWidth: "none",
           height: isMobile ? "50%" : "90%", // new css 
+          placeContent: "center",
+          placeItems: page.description ? "center stretch" : undefined,
         }}
       >
         {page.coverImage || page.image ? (
@@ -244,7 +341,8 @@ export default function StoryBookPage({
                   backgroundColor:
                     selectedWord == `${word} ${index}`
                       ? "var(--Surface-Default, #FF8652)"
-                      : "transparent",
+                      : speakingIndex == index ? "var(--Surface-Default, #FF8652)"
+                        : "transparent",
 
                 }}
                 onClick={(e) => {
@@ -254,7 +352,7 @@ export default function StoryBookPage({
                   if (debounceRef.current) {
                     clearTimeout(debounceRef.current);
                   }
-              
+
                   // Set a new timeout
                   debounceRef.current = setTimeout(() => {
                     getWordMeaning(word);
@@ -277,19 +375,18 @@ export default function StoryBookPage({
                   const parentRect = parentDiv.getBoundingClientRect();
                   let element = e.target; // Target element
                   let container = e.target.parentElement;
-                
+
                   let offset = getOffsetRelativeToContainer(element, container);
-                  
+
                   const relativeX = clickX - parentRect.left;
                   const relativeY = clickY - parentRect.top;
-                 
+
                   var viewwidth = clickXvw.toFixed(2) - 25;
                   var viewheight = clickYvh.toFixed(2) - 14;
-                 
+
                   if (spanRef.current) {
                     var adjust = isMobile ? 50 : 115;
                     setChatgpt(asdad.bottom);
-                    console.log(asdad.right,"right")
                     setChatgptRight(asdad.right);
                     setPopupPosition({
                       top:
@@ -298,7 +395,7 @@ export default function StoryBookPage({
                           : relativeX,
                       left: offset.left - 40,
 
-                 
+
                     });
                     setShowPopup(true);
                   }
@@ -354,7 +451,7 @@ export default function StoryBookPage({
       const utterance = new SpeechSynthesisUtterance(speech);
       // console.log({ voices });
       utterance.rate = 0.9;
-      const selectedVoice = voices.find((v) => v.lang === "en-US"); 
+      const selectedVoice = voices.find((v) => v.lang === "en-US");
       utterance.voice = selectedVoice || voices[0];
       utterance.onend = () => resolve();
       // utterance.onerror = (event) => console.log("ERROR", event.error);
@@ -389,8 +486,8 @@ export default function StoryBookPage({
     };
   }, []);
   const popupRef = useRef(null);
-  const [question,setQuestion]=useState([])
-  const [answer,setanswer]=useState()
+  const [question, setQuestion] = useState([])
+  const [answer, setanswer] = useState()
   useEffect(() => {
     if (page.description) {
       setQuestion("")
@@ -423,15 +520,15 @@ export default function StoryBookPage({
           fontSize: "18px",
           border: "1px solid #ff8652",
           zIndex: "2",
-          
+
           right: "-30px",
-          
-          left:chatgptRight<300? "-30px" :"auto",
-          right: chatgptRight>=300? "-30px":"auto",
+
+          left: chatgptRight < 300 ? "-30px" : "auto",
+          right: chatgptRight >= 300 ? "-30px" : "auto",
           top: chatgpt < 400 ? "30px" : "auto",  // set top if chatgpt > 300
           bottom: chatgpt >= 400 ? "30px" : "auto",  // set bottom if chatgpt <= 300
           maxHeight: "350px",
-          
+
           background: "var(--Surface-Default, #FF8652)",
         }}
       >
@@ -443,21 +540,21 @@ export default function StoryBookPage({
               style={{
                 width: "20px",
                 height: "20px",
-                transform: chatgpt >= 400 ?"rotateZ(225deg)":"rotateZ(45deg)",
+                transform: chatgpt >= 400 ? "rotateZ(225deg)" : "rotateZ(45deg)",
                 border: "1px solid white",
-               
+
                 position: "absolute",
                 borderWidth: "3px 0 0 3px",
                 borderColor: "#ff8652",
                 background: "white",
                 top: chatgpt < 400 ? "-7px" : "auto",
-                bottom:chatgpt >= 400 ? "-7px" : "auto",
+                bottom: chatgpt >= 400 ? "-7px" : "auto",
                 className: "gptResponseDiv",
                 zIndex: "-1",
-              
-                left:chatgptRight<300? "25px" :"auto",
-                right: chatgptRight>=300? "25px":"auto",
-                
+
+                left: chatgptRight < 300 ? "25px" : "auto",
+                right: chatgptRight >= 300 ? "25px" : "auto",
+
               }}
             ></div>
 
@@ -631,7 +728,7 @@ export default function StoryBookPage({
           flexDirection: isMobile ? "column" : "row",
         }}
       >
-    
+
         <RightPage />
       </div>
       <div

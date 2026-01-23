@@ -74,3 +74,47 @@
   .--portrait {
     padding-bottom: 50% !important;
   }
+
+
+  .audio-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+  }
+  
+  .audio-icon {
+    stroke: #ff8652; /* Ear color */
+  }
+  
+  .wave {
+    stroke: #ff8652;
+    stroke-width: 2;
+    opacity: 0.4;
+    transform-origin: center;
+  }
+  
+  /* Animate waves when audio is playing */
+  .wave.animate {
+    animation: pulse 1s infinite;
+  }
+  
+  .wave1.animate { animation-delay: 0s; }
+  .wave2.animate { animation-delay: 0.2s; }
+  .wave3.animate { animation-delay: 0.3s; }
+  
+  /* Keyframes for pulsing wave */
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+    50% {
+      transform: scale(1.2); /* bigger scale */
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+  }
+  
